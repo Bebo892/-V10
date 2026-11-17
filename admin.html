@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#281731">
+  <meta name="robots" content="noindex,nofollow">
+  <title>إدارة منيو حلويات مصر</title>
+  <link rel="icon" type="image/png" href="assets/logo.png">
+  <link rel="stylesheet" href="admin.css">
+  <script type="module" src="admin.js"></script>
+</head>
+<body>
+<header class="admin-header">
+  <div class="header-inner">
+    <a href="index.html" class="logo"><img src="assets/logo.png" alt="شعار حلويات مصر"><span>إدارة منيو الكافيه</span></a>
+    <div class="header-actions"><a class="header-link" href="index.html">عرض المنيو</a><button class="header-link" type="button" id="logout" hidden>تسجيل الخروج</button></div>
+  </div>
+</header>
+<main class="main-area">
+  <section class="intro"><span class="intro-kicker">HALAWEYAT MASR CAFÉ</span><h1>لوحة إدارة المنيو</h1><p>خمسة أقسام، وأسعار وصور وأصناف بتتحدث عند كل زبون.</p></section>
+  <section class="panel" id="loading" aria-live="polite">جاري الاتصال بلوحة الإدارة…</section>
+  <section class="panel" id="setup" hidden><h2>مشكلة في الاتصال</h2><p id="setup-message">راجع إعدادات Firebase والإنترنت.</p></section>
+  <section class="panel login-panel" id="login-panel" hidden>
+    <div class="login-icon" aria-hidden="true">♙</div><h2>دخول الأدمن</h2><p>ادخل باسم المستخدم وكلمة المرور الخاصة بالإدارة.</p>
+    <form id="login-form">
+      <label for="username">اسم المستخدم</label><input id="username" name="username" type="text" placeholder="admin" autocomplete="username" autocapitalize="none" required>
+      <label for="password">كلمة المرور</label><input id="password" name="password" type="password" autocomplete="current-password" required>
+      <button id="login-button" type="submit" class="primary">تسجيل الدخول</button>
+    </form>
+  </section>
+  <section id="dashboard" hidden>
+    <div class="dashboard-heading"><div><span class="intro-kicker">MENU MANAGEMENT</span><h2>إدارة الأصناف</h2><p>اختر قسمًا، وبعدها عدّل السعر أو أضف صنفًا جديدًا بصورة أو بدون.</p></div><div class="summary"><strong id="count">0</strong><span>صنف</span></div></div>
+    <div id="import-banner" class="import-banner" hidden>
+      <div><strong>المنيو لسه مش منشور في قاعدة البيانات</strong><p>اضغط مرة واحدة لاستيراد 120 صنفًا من شيت الأسعار. لن نكتب فوق بيانات موجودة.</p></div>
+      <button class="primary" id="seed-button" type="button">نشر أصناف الشيت لأول مرة</button>
+    </div>
+    <div class="admin-status" id="cloud-status" role="status" aria-live="polite"></div>
+    <div class="section-head"><h3>الأقسام</h3><button class="primary" type="button" id="add-product" disabled>+ إضافة صنف</button></div>
+    <nav id="category-tabs" class="category-tabs" aria-label="أقسام الإدارة"></nav>
+    <div class="toolbar"><label class="search-wrap"><span class="sr-only">بحث</span><input id="product-search" type="search" placeholder="ابحث بالاسم أو الكود…"></label><button class="outline" id="export-backup" type="button">نسخة احتياطية JSON</button></div>
+    <div id="items" class="items"></div>
+    <p id="empty-items" class="empty" hidden>مفيش أصناف مطابقة في القسم.</p>
+  </section>
+  <div class="toast" id="message" role="status" aria-live="polite" hidden></div>
+</main>
+<dialog id="product-dialog" class="editor-dialog" aria-labelledby="editor-title">
+  <div class="dialog-header"><div><span class="intro-kicker">MENU ITEM</span><h2 id="editor-title">إضافة صنف</h2></div><button class="close-dialog" id="close-dialog" type="button" aria-label="إغلاق">×</button></div>
+  <form id="product-form" class="product-form">
+    <label>القسم<select id="edit-category" required><option value="hot-drinks">المشروبات الساخنة</option><option value="cold-drinks">العصائر والمشروبات الباردة</option><option value="dessert-cups">الكاسات والديسيرت</option><option value="mixed-plates">أطباق متنوعة</option><option value="specials">الأصناف المميزة</option></select></label>
+    <label>اسم الصنف بالعربي<input id="edit-ar" maxlength="95" required placeholder="مثال: لاتيه"/></label>
+    <label>الاسم بالإنجليزي (اختياري)<input id="edit-en" maxlength="95" placeholder="e.g. Latte"/></label>
+    <label>السعر بالجنيه (اتركه فارغًا لو لم يتحدد)<input id="edit-price" type="number" inputmode="decimal" min="1" max="100000" step="0.5" placeholder="مثال: 65"/></label>
+    <div class="description-fields" id="description-fields">
+      <label>الوصف بالعربي (للأطباق والأصناف المميزة)<textarea id="edit-desc-ar" rows="2" maxlength="550" placeholder="وصف مختصر بدون معلومات غير مؤكدة"></textarea></label>
+      <label>الوصف بالإنجليزي (اختياري)<textarea id="edit-desc-en" rows="2" maxlength="550"></textarea></label>
+      <label>المكونات بالعربي (افصل بفاصلة)<input id="edit-ingredients-ar" maxlength="300" placeholder="قشطة، شوكولاتة"/></label>
+      <label>المكونات بالإنجليزي (افصل بفاصلة)<input id="edit-ingredients-en" maxlength="300" placeholder="Cream, Chocolate"/></label>
+    </div>
+    <div class="photo-field"><strong>صورة الصنف (اختيارية)</strong><p>اختر صورة من جهازك. هنضغطها تلقائيًا لتوفير المساحة في Firestore المجاني.</p>
+      <input id="edit-image" type="file" accept="image/png,image/jpeg,image/webp,image/avif"/>
+      <div class="photo-preview" id="photo-preview" hidden><img id="photo-preview-img" alt="معاينة الصورة"></div>
+      <label class="inline-check"><input type="checkbox" id="edit-remove-image"/> إزالة الصورة الحالية</label>
+    </div>
+    <label class="inline-check"><input type="checkbox" id="edit-active" checked/> الصنف متاح ويظهر للزبائن</label>
+    <div class="editor-actions"><button class="outline" type="button" id="cancel-edit">إلغاء</button><button class="primary" type="submit" id="save-product">حفظ الصنف</button></div>
+  </form>
+</dialog>
+</body>
+</html>

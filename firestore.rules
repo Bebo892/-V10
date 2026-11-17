@@ -1,0 +1,40 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isAdmin() {
+      return request.auth != null && request.auth.uid == 'xYTJRUX7bMMdIkoepGViPhmIrsw2';
+    }
+    // V10: public menu catalog. The first write imports 120 items from the Excel sheet.
+    match /menu/catalog {
+      allow get: if true;
+      allow list: if false;
+      allow create, update: if isAdmin()
+        && request.resource.data.keys().hasOnly(['products','updatedAt','version'])
+        && request.resource.data.keys().hasAll(['products','updatedAt','version'])
+        && request.resource.data.products is list
+        && request.resource.data.products.size() <= 400
+        && request.resource.data.version is int
+        && request.resource.data.updatedAt is timestamp;
+      allow delete: if false;
+    }
+    // Keep older V9 price document secure, but V10 doesn't write it.
+    match /menu/prices {
+      allow get: if true;
+      allow list: if false;
+      allow write: if false;
+    }
+    // Photos are compressed small thumbnails, never full-size originals.
+    match /menuImages/{itemId} {
+      allow get: if true;
+      allow list: if false;
+      allow create, update: if isAdmin()
+        && request.resource.data.keys().hasOnly(['dataUrl','updatedAt'])
+        && request.resource.data.keys().hasAll(['dataUrl','updatedAt'])
+        && request.resource.data.dataUrl is string
+        && request.resource.data.dataUrl.size() < 155000
+        && request.resource.data.updatedAt is timestamp;
+      allow delete: if isAdmin();
+    }
+    match /{document=**} { allow read, write: if false; }
+  }
+}

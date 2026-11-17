@@ -1,0 +1,17 @@
+{
+  "source": "cafe menu Items List Report.xlsx",
+  "sheet_store": "طنطا",
+  "counts": {
+    "specials": 7,
+    "dessert-cups": 32,
+    "cold-drinks": 21,
+    "hot-drinks": 21,
+    "mixed-plates": 39
+  },
+  "total": 120,
+  "needs_price": [
+    "طبق شامية",
+    "طبق سواريه",
+    "طبق ساليزون"
+  ]
+}
