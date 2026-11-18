@@ -18,7 +18,7 @@
   </div>
 </header>
 <main class="main-area">
-  <section class="intro"><span class="intro-kicker">HALAWEYAT MASR CAFÉ</span><h1>لوحة إدارة المنيو</h1><p>خمسة أقسام، وأسعار وصور وأصناف بتتحدث عند كل زبون.</p></section>
+  <section class="intro"><span class="intro-kicker">HALAWEYAT MASR CAFÉ</span><h1>لوحة إدارة المنيو</h1><p>تحكّم في أصناف الكافيه وأسعارها وصورها بسهولة من مكان واحد.</p></section>
   <section class="panel" id="loading" aria-live="polite">جاري الاتصال بلوحة الإدارة…</section>
   <section class="panel" id="setup" hidden><h2>مشكلة في الاتصال</h2><p id="setup-message">راجع إعدادات Firebase والإنترنت.</p></section>
   <section class="panel login-panel" id="login-panel" hidden>
@@ -30,15 +30,15 @@
     </form>
   </section>
   <section id="dashboard" hidden>
-    <div class="dashboard-heading"><div><span class="intro-kicker">MENU MANAGEMENT</span><h2>إدارة الأصناف</h2><p>اختر قسمًا، وبعدها عدّل السعر أو أضف صنفًا جديدًا بصورة أو بدون.</p></div><div class="summary"><strong id="count">0</strong><span>صنف</span></div></div>
+    <div class="dashboard-heading"><div><span class="intro-kicker">MENU MANAGEMENT</span><h2>إدارة الأصناف</h2><p>اختر القسم المطلوب لإدارة المنتجات والأسعار والصور.</p></div><div class="summary"><strong id="count">0</strong><span>صنف</span></div></div>
     <div id="import-banner" class="import-banner" hidden>
-      <div><strong>المنيو لسه مش منشور في قاعدة البيانات</strong><p>اضغط مرة واحدة لاستيراد 120 صنفًا من شيت الأسعار. لن نكتب فوق بيانات موجودة.</p></div>
-      <button class="primary" id="seed-button" type="button">نشر أصناف الشيت لأول مرة</button>
+      <div><strong>قائمة المنتجات قيد التجهيز</strong><p>جهّز قائمة المنتجات الأولية لبدء إدارة المنيو.</p></div>
+      <button class="primary" id="seed-button" type="button">تجهيز قائمة المنتجات</button>
     </div>
     <div class="admin-status" id="cloud-status" role="status" aria-live="polite"></div>
     <div class="section-head"><h3>الأقسام</h3><button class="primary" type="button" id="add-product" disabled>+ إضافة صنف</button></div>
     <nav id="category-tabs" class="category-tabs" aria-label="أقسام الإدارة"></nav>
-    <div class="toolbar"><label class="search-wrap"><span class="sr-only">بحث</span><input id="product-search" type="search" placeholder="ابحث بالاسم أو الكود…"></label><button class="outline" id="export-backup" type="button">نسخة احتياطية JSON</button></div>
+    <div class="toolbar"><label class="search-wrap"><span class="sr-only">بحث</span><input id="product-search" type="search" placeholder="ابحث بالاسم أو الكود…"></label><button class="outline" id="export-backup" type="button">تحميل نسخة احتياطية</button></div>
     <div id="items" class="items"></div>
     <p id="empty-items" class="empty" hidden>مفيش أصناف مطابقة في القسم.</p>
   </section>
@@ -57,7 +57,7 @@
       <label>المكونات بالعربي (افصل بفاصلة)<input id="edit-ingredients-ar" maxlength="300" placeholder="قشطة، شوكولاتة"/></label>
       <label>المكونات بالإنجليزي (افصل بفاصلة)<input id="edit-ingredients-en" maxlength="300" placeholder="Cream, Chocolate"/></label>
     </div>
-    <div class="photo-field"><strong>صورة الصنف (اختيارية)</strong><p>اختر صورة من جهازك. هنضغطها تلقائيًا لتوفير المساحة في Firestore المجاني.</p>
+    <div class="photo-field"><strong>صورة الصنف (اختيارية)</strong><p>اختر صورة من جهازك، وسيتم تحسين حجمها تلقائيًا قبل الحفظ.</p>
       <input id="edit-image" type="file" accept="image/png,image/jpeg,image/webp,image/avif"/>
       <div class="photo-preview" id="photo-preview" hidden><img id="photo-preview-img" alt="معاينة الصورة"></div>
       <label class="inline-check"><input type="checkbox" id="edit-remove-image"/> إزالة الصورة الحالية</label>
