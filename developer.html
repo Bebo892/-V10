@@ -28,39 +28,29 @@
     .dev-pill{display:inline-flex;border-radius:30px;background:#eee7f2;color:#543468;padding:4px 10px;font-size:12px;font-weight:800}
     .dev-entry h3{font-size:15px;margin:10px 0 4px}
     .dev-entry p{font-size:13px;margin:4px 0;color:#685871;line-height:1.7;overflow-wrap:anywhere}
+    .audit-details{margin:10px 0;padding:10px 12px;background:#f8f3fa;border:1px solid #eee5f1;border-radius:10px}
+    .dev-entry .audit-details h3{margin-top:0}
+    .audit-changes{display:grid;gap:6px;margin:8px 0}
+    .audit-changes div{display:grid;grid-template-columns:minmax(95px,1fr) 4fr;gap:8px;font-size:13px}
+    .audit-changes dt{font-weight:700;color:#543468}
+    .audit-changes dd{margin:0;overflow-wrap:anywhere;color:#4b3654;white-space:pre-wrap}
+    .audit-product-name{font-weight:800}
     .dev-entry time{font-size:12px;color:#87738c}
     .dev-entry .device{font-size:11px;color:#86778c}
     .dev-alert{padding:14px 17px;background:#f5eef9;border:1px solid #e8daed;border-radius:12px;color:#4b3654;line-height:1.8}
     @media(max-width:600px){.dev-heading{flex-direction:column}.dev-box{padding:18px}.dev-shell{padding:0 14px}}
     [hidden]{display:none!important}
   </style>
-  <link rel="stylesheet" href="password-field.css?v=1">
-  <script defer src="password-field.js?v=1"></script>
-  <script type="module" src="developer.js?v=menu-stats-1"></script>
+  <script type="module" src="developer.js?v=audit-details-1"></script>
 </head>
 <body>
 <header class="admin-header"><div class="header-inner">
   <a class="logo" href="admin.html"><img src="assets/logo.png" alt="حلويات مصر"><span>لوحة الإدارة</span></a>
-  <div class="header-actions"><a class="header-link" href="admin.html">الرجوع للأدمن</a><button class="header-link" id="dev-logout" type="button" hidden>خروج Developer</button></div>
+  <div class="header-actions"><a class="header-link" href="admin.html">Main Admin</a><button class="header-link" id="dev-logout" type="button" hidden>خروج Developer</button></div>
 </div></header>
 <main class="dev-shell">
   <div class="dev-heading"><div><h1>Developer | سجل الإدارة</h1><p>سجل دخول الإدارة والتغييرات المحفوظة، متاح لحساب المالك المصرّح له فقط.</p></div></div>
   <div class="dev-alert" id="dev-message" role="status" aria-live="polite">جاري إعداد اتصال آمن…</div>
-  <section id="dev-login" class="dev-box dev-auth" hidden>
-    <h2>دخول المالك</h2>
-    <p class="muted">هذه الصفحة لها حساب وكلمة مرور مستقلان عن حساب إدارة المنيو.</p>
-    <form id="dev-form">
-      <label>بريد المالك الإلكتروني<input id="dev-email" type="email" autocomplete="username" required></label>
-      <label for="dev-password">كلمة مرور Developer</label>
-      <div class="password-field">
-        <input id="dev-password" type="password" autocomplete="current-password" required>
-        <button class="outline password-toggle" type="button" aria-controls="dev-password" aria-label="إظهار كلمة المرور" data-password-toggle hidden>إظهار</button>
-      </div>
-      <button class="primary" type="submit" id="dev-login-button">فتح السجل</button>
-      <button class="outline" type="button" id="dev-reset-password">تعيين أو إعادة تعيين كلمة المرور</button>
-    </form>
-    <p class="dev-note">لا يتم حفظ كلمة المرور داخل الموقع. لا تشارك كلمة المرور مع العاملين على المنيو.</p>
-  </section>
   <section id="dev-dashboard" hidden>
     <section class="dev-box menu-stats" aria-labelledby="stats-heading">
       <div class="stats-header">
@@ -80,7 +70,7 @@
       </div>
     </section>
     <div class="dev-toolbar"><span class="dev-total" id="dev-count"></span><button type="button" class="outline" id="dev-refresh">تحديث السجل</button></div>
-    <div class="dev-alert">وقت النشاط من Firebase. يظهر الموقع التقريبي في حدث تسجيل الدخول ويأتي من جهاز الموظف.</div>
+    <div class="dev-alert">الموقع المعروض هو المكان التقريبي وقت دخول الإدارة.</div>
     <div class="dev-list" id="dev-entries" style="margin-top:16px"></div>
     <p class="muted" id="dev-empty" hidden>لم تُسجل أنشطة بعد.</p>
   </section>
