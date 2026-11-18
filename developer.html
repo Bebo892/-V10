@@ -34,6 +34,8 @@
     @media(max-width:600px){.dev-heading{flex-direction:column}.dev-box{padding:18px}.dev-shell{padding:0 14px}}
     [hidden]{display:none!important}
   </style>
+  <link rel="stylesheet" href="password-field.css?v=1">
+  <script defer src="password-field.js?v=1"></script>
   <script type="module" src="developer.js?v=menu-stats-1"></script>
 </head>
 <body>
@@ -49,7 +51,11 @@
     <p class="muted">هذه الصفحة لها حساب وكلمة مرور مستقلان عن حساب إدارة المنيو.</p>
     <form id="dev-form">
       <label>بريد المالك الإلكتروني<input id="dev-email" type="email" autocomplete="username" required></label>
-      <label>كلمة مرور Developer<input id="dev-password" type="password" autocomplete="current-password" required></label>
+      <label for="dev-password">كلمة مرور Developer</label>
+      <div class="password-field">
+        <input id="dev-password" type="password" autocomplete="current-password" required>
+        <button class="outline password-toggle" type="button" aria-controls="dev-password" aria-label="إظهار كلمة المرور" data-password-toggle hidden>إظهار</button>
+      </div>
       <button class="primary" type="submit" id="dev-login-button">فتح السجل</button>
       <button class="outline" type="button" id="dev-reset-password">تعيين أو إعادة تعيين كلمة المرور</button>
     </form>
