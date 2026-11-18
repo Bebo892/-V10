@@ -285,4 +285,14 @@ $('#seed-button').addEventListener('click',async()=>{
   }catch(e){notify('تعذر نشر الأصناف: '+(e.code||e.message),true);}
   finally{setBusy(false);$('#seed-button').textContent='نشر أصناف الشيت لأول مرة';}
 });
+// Browsers may restore a previous admin page without reloading it (back/forward cache).
+// Hide the old view and end the memory-only session before showing the page again.
+window.addEventListener('pageshow',event=>{
+  if(event.persisted){
+    show('#dashboard',false);
+    show('#loading',true);
+    if(authSdk && firebaseAuth){authSdk.signOut(firebaseAuth).catch(()=>location.reload());}
+    else location.reload();
+  }
+});
 init();
