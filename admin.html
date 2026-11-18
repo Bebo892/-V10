@@ -8,7 +8,7 @@
   <title>إدارة منيو حلويات مصر</title>
   <link rel="icon" type="image/png" href="assets/logo.png">
   <link rel="stylesheet" href="admin.css">
-  <script type="module" src="admin.js?v=audit-1"></script>
+  <script type="module" src="admin.js?v=audit-2"></script>
 </head>
 <body>
 <header class="admin-header">
@@ -26,9 +26,9 @@
   <section class="panel" id="loading" aria-live="polite">جاري الاتصال بلوحة الإدارة…</section>
   <section class="panel" id="setup" hidden><h2>مشكلة في الاتصال</h2><p id="setup-message">راجع إعدادات Firebase والإنترنت.</p></section>
   <section class="panel login-panel" id="login-panel" hidden>
-    <div class="login-icon" aria-hidden="true">♙</div><h2>دخول الأدمن</h2><p>ادخل بالبريد وكلمة المرور الخاصة بحسابك. مشاركة الموقع التقريبي مطلوبة مرة واحدة عند تسجيل الدخول وتظهر للمالك في سجل النشاط.</p>
+    <div class="login-icon" aria-hidden="true">♙</div><h2>دخول الأدمن</h2><p>لازم توافق على نشر معلومات المكان</p>
     <form id="login-form">
-      <label for="staff-email">البريد الإلكتروني للموظف</label><input id="staff-email" name="email" type="email" autocomplete="username" autocapitalize="none" required>
+      <label for="staff-login">اسم الدخول أو البريد الإلكتروني</label><input id="staff-login" name="username" type="text" placeholder="admin" autocomplete="username" autocapitalize="none" required>
       <label for="password">كلمة المرور</label><input id="password" name="password" type="password" autocomplete="current-password" required>
       <button id="login-button" type="submit" class="primary">السماح بالموقع وتسجيل الدخول</button>
     </form>
