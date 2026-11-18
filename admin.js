@@ -10,7 +10,7 @@ const CATEGORY_NAMES={
   'specials':'الأصناف المميزة'
 };
 const categories=Object.keys(CATEGORY_NAMES);
-let firebaseAuth=null, authSdk=null, fs=null, db=null, unsub=null;
+let appSdk=null, firebaseAuth=null, authSdk=null, fs=null, db=null, unsub=null;
 let products=[], fromServer=false, currentCategory=categories[0], currentEditId=null, stagedImage=null, editorCatalogTime=null;
 let busy=false, showingAdmin=false, sessionId=null, catalogTime=null;
 const MAX_ITEMS=400;
@@ -162,14 +162,29 @@ function approximateLocation(){
 function auditEvent(type, details={}){
   return {type,actorUid:firebaseAuth.currentUser.uid,actorEmail:firebaseAuth.currentUser.email,sessionId,createdAt:fs.serverTimestamp(),...details};
 }
+const loginEmail=identifier=>identifier.toLowerCase()===adminUsername.toLowerCase()?adminLoginEmail:identifier;
+async function openOwnerDashboard(user){
+  const handoff=authSdk.initializeAuth(appSdk.initializeApp(firebaseConfig,'developer-owner-panel'),{
+    persistence:authSdk.browserSessionPersistence
+  });
+  try{
+    await authSdk.updateCurrentUser(handoff,user);
+    await authSdk.signOut(firebaseAuth);
+  }catch(error){
+    await authSdk.signOut(handoff).catch(()=>{});
+    throw error;
+  }
+  location.replace('./developer.html');
+}
 async function login(identifier,password){
-  const email=identifier.toLowerCase()===adminUsername.toLowerCase()?adminLoginEmail:identifier;
+  const email=loginEmail(identifier);
   if(!email.includes('@'))throw new Error('اكتب admin أو البريد الإلكتروني لحسابك.');
-  const location=await approximateLocation();
   const {user}=await authSdk.signInWithEmailAndPassword(firebaseAuth,email,password);
   try{
     const role=await fs.getDocFromServer(fs.doc(db,'auditRoles',user.uid));
-    if(role.data()?.role!=='staff')throw new Error('هذا الحساب ليس حساب موظف مصرح له.');
+    if(role.data()?.role==='owner'){await openOwnerDashboard(user);return;}
+    if(role.data()?.role!=='staff')throw new Error('هذا الحساب غير مصرح له بدخول الإدارة.');
+    const location=await approximateLocation();
     sessionId=crypto.randomUUID();
     const token=await authSdk.getIdTokenResult(user);
     await fs.setDoc(fs.doc(db,'auditLogs',sessionId),auditEvent('login',{location,authTime:token.claims.auth_time}));
@@ -192,11 +207,16 @@ async function saveCatalog(nextItems, type, productId, imageAction=null){
     const ref=fs.doc(db,'menu','catalog');
     await fs.runTransaction(db,async transaction=>{
       const snapshot=await transaction.get(ref);
-      if(!expectedTime?.isEqual(snapshot.data()?.updatedAt)){
+      const saved=snapshot.data();
+      if(!expectedTime?.isEqual(saved?.updatedAt)){
         throw new Error('موظف آخر عدّل المنيو. افتح الصنف من جديد قبل الحفظ.');
       }
       transaction.set(ref,{products:items,version:10,updatedAt:fs.serverTimestamp(),auditId:auditRef.id});
-      transaction.set(auditRef,event);
+      const beforeIndex=saved.products.findIndex(item=>item.id===productId);
+      const afterIndex=items.findIndex(item=>item.id===productId);
+      transaction.set(auditRef,{...event,details:{
+        beforeIndex,afterIndex,before:saved.products[beforeIndex]??null,after:items[afterIndex]??null
+      }});
       if(imageAction){
         const imageRef=fs.doc(db,'menuImages',productId);
         if(imageAction.type==='put')transaction.set(imageRef,{dataUrl:imageAction.dataUrl,updatedAt:fs.serverTimestamp()});
@@ -251,7 +271,7 @@ async function init(){
       import('https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js'),
       import('https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js')
     ]);
-    authSdk=authentication;fs=firestore;
+    appSdk=app;authSdk=authentication;fs=firestore;
     const instance=app.initializeApp(firebaseConfig,'staff-admin-panel');
     firebaseAuth=authentication.initializeAuth(instance,{persistence:authentication.inMemoryPersistence});
     db=firestore.getFirestore(instance);
@@ -284,7 +304,21 @@ $('#login-form').addEventListener('submit',async e=>{
   e.preventDefault();const btn=$('#login-button');btn.disabled=true;btn.textContent='جاري الدخول…';
   try{await login($('#staff-login').value.trim(),$('#password').value);}
   catch(error){notify(error.code?'تعذر تسجيل الدخول. راجع بيانات الحساب وإعدادات الاتصال.':error.message,true);}
-  finally{$('#password').value='';btn.disabled=false;btn.textContent='السماح بالموقع وتسجيل الدخول';}
+  finally{$('#password').value='';btn.disabled=false;btn.textContent='تسجيل الدخول';}
+});
+$('#reset-admin-password').addEventListener('click',async event=>{
+  const email=loginEmail($('#staff-login').value.trim());
+  if(!email.includes('@'))return notify('اكتب اسم الدخول أو البريد الأول.',true);
+  const button=event.currentTarget;
+  button.disabled=true;
+  const sent='لو الحساب موجود، هيجيلك رابط تعيين كلمة المرور على البريد.';
+  try{
+    await authSdk.sendPasswordResetEmail(firebaseAuth,email);
+    notify(sent);
+  }catch(error){
+    if(error.code==='auth/user-not-found')notify(sent);
+    else notify('تعذر إرسال الرابط. حاول مرة أخرى بعد قليل.',true);
+  }finally{button.disabled=false;}
 });
 $('#logout').addEventListener('click',async()=>{
   if(!showingAdmin||busy)return;
