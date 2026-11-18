@@ -1,5 +1,7 @@
 import {firebaseConfig,firebaseReady} from './firebase-config.js';
 
+import {clearMenuStats,loadMenuStats} from './menu-stats-dashboard.js?v=1';
+
 const $=selector=>document.querySelector(selector);
 const show=(selector,visible)=>{$(selector).hidden=!visible;};
 let sdk,auth,fs,db,owner=null,requestNumber=0;
@@ -44,6 +46,7 @@ function clearOwner(){
   owner=null;
   requestNumber++;
   clearEvents();
+  clearMenuStats();
   show('#dev-dashboard',false);
   show('#dev-logout',false);
 }
@@ -113,6 +116,7 @@ $('#dev-form').addEventListener('submit',async event=>{
     show('#dev-login',false);
     show('#dev-dashboard',true);
     show('#dev-logout',true);
+    void refreshStats();
     await loadEvents();
   }catch{
     await logout('تعذر تسجيل الدخول. راجع بيانات الحساب وإعدادات الاتصال.',true);
@@ -123,6 +127,11 @@ $('#dev-form').addEventListener('submit',async event=>{
 });
 $('#dev-logout').addEventListener('click',()=>logout());
 $('#dev-refresh').addEventListener('click',loadEvents);
+function refreshStats(){
+  if(owner&&auth.currentUser===owner)return loadMenuStats(fs,db);
+}
+$('#stats-range').addEventListener('change',refreshStats);
+$('#stats-refresh').addEventListener('click',refreshStats);
 $('#dev-reset-password').addEventListener('click',async event=>{
   const email=$('#dev-email');
   if(!email.reportValidity())return;
