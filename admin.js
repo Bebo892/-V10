@@ -164,7 +164,7 @@ async function saveCatalog(nextItems, imageAction=null){
     await batch.commit();
     products=items;
     renderItems();
-    notify('تم الحفظ في Firebase. التغيير هيظهر للزبائن تلقائيًا.');
+    notify('تم حفظ التعديلات بنجاح.');
   }catch(e){console.error(e);notify('الحفظ لم يتم: '+(e.code||e.message||'راجع الاتصال وقواعد Firestore'),true);throw e;}
   finally{setBusy(false);}
 }
@@ -214,7 +214,18 @@ async function init(){
     authSdk=authentication;fs=firestore;
     const instance=app.getApps().length?app.getApp():app.initializeApp(firebaseConfig);
     firebaseAuth=authentication.getAuth(instance);db=firestore.getFirestore(instance);
-    try{await authentication.setPersistence(firebaseAuth,authentication.browserLocalPersistence);}catch(e){console.warn('Local auth persistence unavailable',e);}
+    // The administration session is intentionally memory-only. Leaving/reloading
+    // the page discards it, and any previously remembered login is invalidated.
+    // Never store passwords or a second access code in client-side files.
+    try {
+      await authentication.setPersistence(firebaseAuth,authentication.inMemoryPersistence);
+      await authentication.signOut(firebaseAuth);
+    } catch(e) {
+      console.error('Unable to enforce secure admin session',e);
+      show('#loading',false);show('#setup',true);
+      $('#setup-message').textContent='تعذر تأمين جلسة الإدارة. أعد تحميل الصفحة وحاول مرة أخرى.';
+      return;
+    }
     authentication.onAuthStateChanged(firebaseAuth,user=>{
       if(unsub){unsub();unsub=null;}
       show('#loading',false);
