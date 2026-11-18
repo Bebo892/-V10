@@ -192,11 +192,16 @@ async function saveCatalog(nextItems, type, productId, imageAction=null){
     const ref=fs.doc(db,'menu','catalog');
     await fs.runTransaction(db,async transaction=>{
       const snapshot=await transaction.get(ref);
-      if(!expectedTime?.isEqual(snapshot.data()?.updatedAt)){
+      const saved=snapshot.data();
+      if(!expectedTime?.isEqual(saved?.updatedAt)){
         throw new Error('موظف آخر عدّل المنيو. افتح الصنف من جديد قبل الحفظ.');
       }
       transaction.set(ref,{products:items,version:10,updatedAt:fs.serverTimestamp(),auditId:auditRef.id});
-      transaction.set(auditRef,event);
+      const beforeIndex=saved.products.findIndex(item=>item.id===productId);
+      const afterIndex=items.findIndex(item=>item.id===productId);
+      transaction.set(auditRef,{...event,details:{
+        beforeIndex,afterIndex,before:saved.products[beforeIndex]??null,after:items[afterIndex]??null
+      }});
       if(imageAction){
         const imageRef=fs.doc(db,'menuImages',productId);
         if(imageAction.type==='put')transaction.set(imageRef,{dataUrl:imageAction.dataUrl,updatedAt:fs.serverTimestamp()});
