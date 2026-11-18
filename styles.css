@@ -1360,3 +1360,32 @@ html[dir="ltr"] .product-tap:focus-visible .details-arrow { transform: scaleX(-1
 .footer-admin-link:focus-visible { outline:3px solid #E6D0A7; outline-offset:3px; }
 @media (max-width:650px) { .footer-bottom {flex-wrap:wrap;gap:14px;} .footer-bottom-actions{width:100%;justify-content:space-between;gap:12px;} .footer-admin-link{min-height:44px;padding:10px 14px;} }
 @media (prefers-reduced-motion:reduce) { .footer-admin-link { transition:none; } }
+
+/* V10.3 — Soft Edge Product Photography
+   A subtle feather belongs to the photographic pixels, not the ice cream.
+   Natural-size image layout avoids object-fit letterboxing, so the mask
+   follows the real photo edges even in narrow two-column mobile cards. */
+.product-card--detail .photo-visual {
+  background: #F4EDF8;
+}
+.product-card--detail .photo-visual img {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 8px;
+  -webkit-mask-image: linear-gradient(to right,
+    transparent 0%, rgba(0,0,0,.5) 5%, #000 11%,
+    #000 89%, rgba(0,0,0,.5) 95%, transparent 100%);
+  mask-image: linear-gradient(to right,
+    transparent 0%, rgba(0,0,0,.5) 5%, #000 11%,
+    #000 89%, rgba(0,0,0,.5) 95%, transparent 100%);
+}
+
+/* Keep product photos fully legible when masking is unavailable. */
+@supports not (mask-image: linear-gradient(to right, transparent, black)) {
+  .product-card--detail .photo-visual img {
+    border-radius: 12px;
+  }
+}

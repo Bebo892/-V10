@@ -14,6 +14,7 @@ let dbApi, db;
 const isImageData = value=>typeof value==='string' && /^data:image\/(webp|jpeg|png);base64,[A-Za-z0-9+/=]+$/.test(value) && value.length < 155000;
 const addClass = (node,classes) => node.className=classes;
 const txt=(tag,value,classes='')=>{const n=document.createElement(tag);n.textContent=String(value??'');if(classes)n.className=classes;return n;};
+const versionedAsset=path=>typeof path==='string'&&path.startsWith('assets/products/')?path+(path.includes('?')?'&':'?')+'v=103-2':path;
 const validProduct=p=>p && typeof p==='object' && typeof p.id==='string' && /^[\w-]{1,70}$/.test(p.id) && categories.includes(p.category) && typeof p.ar==='string' && p.ar.trim().length>0;
 
 function makeCard(p){
@@ -27,7 +28,7 @@ function makeCard(p){
     descriptionAr:p.descriptionAr||'',descriptionEn:p.descriptionEn||'',
     ingredientsAr:(Array.isArray(p.ingredientsAr)?p.ingredientsAr:[]).join('|'),
     ingredientsEn:(Array.isArray(p.ingredientsEn)?p.ingredientsEn:[]).join('|'),
-    image:p.imageSource==='asset' && p.image?p.image:''
+    image:p.imageSource==='asset' && p.image?versionedAsset(p.image):''
   });
   if(p.imageSource==='firestore' && p.hasImage) article.dataset.cloudImage=p.id;
   const priceSpan=txt('span', price===null?'':price,'price');
@@ -36,7 +37,7 @@ function makeCard(p){
   if(!detail){
     if(p.image || (p.imageSource==='firestore' && p.hasImage)){
       const thumb=document.createElement('div');addClass(thumb,'simple-thumb');
-      if(p.imageSource==='asset' && p.image){const img=document.createElement('img');img.src=p.image;img.alt=p.ar;img.loading='lazy';thumb.append(img);}
+      if(p.imageSource==='asset' && p.image){const img=document.createElement('img');img.src=versionedAsset(p.image);img.alt=p.ar;img.loading='lazy';thumb.append(img);}
       else thumb.classList.add('simple-thumb--pending');
       article.append(thumb);
     }
@@ -49,7 +50,7 @@ function makeCard(p){
   const cloud=p.imageSource==='firestore' && p.hasImage;
   if((p.imageSource==='asset' && p.image)||cloud){
     addClass(visual,'product-visual photo-visual'+(cloud?' photo-visual--pending':''));
-    if(!cloud){const img=document.createElement('img');img.src=p.image;img.alt=p.ar;img.loading='lazy';visual.append(img);}
+    if(!cloud){const img=document.createElement('img');img.src=versionedAsset(p.image);img.alt=p.ar;img.loading='lazy';visual.append(img);}
     else visual.append(txt('span','جاري تحميل الصورة…','plate-visual-caption'));
   }else{
     addClass(visual,'product-visual plate-visual');
