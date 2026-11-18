@@ -1,4 +1,4 @@
-import {firebaseConfig, firebaseReady} from './firebase-config.js';
+import {firebaseConfig, firebaseReady, adminLoginEmail, adminUsername} from './firebase-config.js';
 
 const $ = s=>document.querySelector(s);
 const show=(selector,value)=>{$(selector).hidden=!value;};
@@ -162,7 +162,9 @@ function approximateLocation(){
 function auditEvent(type, details={}){
   return {type,actorUid:firebaseAuth.currentUser.uid,actorEmail:firebaseAuth.currentUser.email,sessionId,createdAt:fs.serverTimestamp(),...details};
 }
-async function login(email,password){
+async function login(identifier,password){
+  const email=identifier.toLowerCase()===adminUsername.toLowerCase()?adminLoginEmail:identifier;
+  if(!email.includes('@'))throw new Error('اكتب admin أو البريد الإلكتروني لحسابك.');
   const location=await approximateLocation();
   const {user}=await authSdk.signInWithEmailAndPassword(firebaseAuth,email,password);
   try{
@@ -280,7 +282,7 @@ function openDashboard(user){
 }
 $('#login-form').addEventListener('submit',async e=>{
   e.preventDefault();const btn=$('#login-button');btn.disabled=true;btn.textContent='جاري الدخول…';
-  try{await login($('#staff-email').value.trim(),$('#password').value);}
+  try{await login($('#staff-login').value.trim(),$('#password').value);}
   catch(error){notify(error.code?'تعذر تسجيل الدخول. راجع بيانات الحساب وإعدادات الاتصال.':error.message,true);}
   finally{$('#password').value='';btn.disabled=false;btn.textContent='السماح بالموقع وتسجيل الدخول';}
 });
