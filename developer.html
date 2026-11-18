@@ -8,6 +8,7 @@
   <title>Developer | حلويات مصر</title>
   <link rel="icon" type="image/png" href="assets/logo.png">
   <link rel="stylesheet" href="admin.css?v=104">
+  <link rel="stylesheet" href="menu-stats.css?v=1">
   <style>
     .dev-shell{max-width:1100px;margin:25px auto 70px;padding:0 20px}
     .dev-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:22px}
@@ -33,7 +34,7 @@
     @media(max-width:600px){.dev-heading{flex-direction:column}.dev-box{padding:18px}.dev-shell{padding:0 14px}}
     [hidden]{display:none!important}
   </style>
-  <script type="module" src="developer.js?v=audit-2"></script>
+  <script type="module" src="developer.js?v=menu-stats-1"></script>
 </head>
 <body>
 <header class="admin-header"><div class="header-inner">
@@ -55,10 +56,24 @@
     <p class="dev-note">لا يتم حفظ كلمة المرور داخل الموقع. لا تشارك كلمة المرور مع العاملين على المنيو.</p>
   </section>
   <section id="dev-dashboard" hidden>
-    <div class="dev-toolbar"><span class="dev-total" id="dev-count"></span><div class="header-actions">
-      <a href="https://analytics.google.com/analytics/web/#/p564846426/reports/intelligenthome" target="_blank" rel="noopener noreferrer" class="outline">إحصاءات الزوار</a>
-      <button type="button" class="outline" id="dev-refresh">تحديث السجل</button>
-    </div></div>
+    <section class="dev-box menu-stats" aria-labelledby="stats-heading">
+      <div class="stats-header">
+        <h2 id="stats-heading">إحصاءات المنيو</h2>
+        <div class="stats-controls">
+          <label for="stats-range">الفترة</label>
+          <select id="stats-range"><option value="7">آخر ٧ أيام</option><option value="1">اليوم</option></select>
+          <button type="button" class="outline" id="stats-refresh">تحديث الإحصاءات</button>
+        </div>
+      </div>
+      <p class="stats-summary" id="stats-summary" hidden><strong id="stats-total"></strong> زيارة</p>
+      <p class="dev-note">كل متصفح يتحسب مرة في اليوم، وكل قسم مرة لكل متصفح في اليوم.</p>
+      <p class="stats-status" role="status" id="stats-status"></p>
+      <div class="stats-grid">
+        <section aria-labelledby="stats-visitor-title"><h3 id="stats-visitor-title">الزيارات حسب اليوم</h3><ul class="stats-chart" id="stats-visitor-chart"></ul></section>
+        <section aria-labelledby="stats-section-title"><h3 id="stats-section-title">أكثر الأقسام مشاهدة</h3><ul class="stats-chart" id="stats-section-chart"></ul></section>
+      </div>
+    </section>
+    <div class="dev-toolbar"><span class="dev-total" id="dev-count"></span><button type="button" class="outline" id="dev-refresh">تحديث السجل</button></div>
     <div class="dev-alert">وقت النشاط من Firebase. يظهر الموقع التقريبي في حدث تسجيل الدخول ويأتي من جهاز الموظف.</div>
     <div class="dev-list" id="dev-entries" style="margin-top:16px"></div>
     <p class="muted" id="dev-empty" hidden>لم تُسجل أنشطة بعد.</p>
