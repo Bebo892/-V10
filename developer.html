@@ -33,7 +33,7 @@
     @media(max-width:600px){.dev-heading{flex-direction:column}.dev-box{padding:18px}.dev-shell{padding:0 14px}}
     [hidden]{display:none!important}
   </style>
-  <script type="module" src="developer.js?v=104"></script>
+  <script type="module" src="developer.js?v=audit-1"></script>
 </head>
 <body>
 <header class="admin-header"><div class="header-inner">
@@ -41,13 +41,13 @@
   <div class="header-actions"><a class="header-link" href="admin.html">الرجوع للأدمن</a><button class="header-link" id="dev-logout" type="button" hidden>خروج Developer</button></div>
 </div></header>
 <main class="dev-shell">
-  <div class="dev-heading"><div><span class="intro-kicker">OWNER ACCESS</span><h1>Developer | سجل الإدارة</h1><p>سجل دخول الإدارة والتغييرات المحفوظة، متاح لحساب المالك المصرّح له فقط.</p></div></div>
+  <div class="dev-heading"><div><h1>Developer | سجل الإدارة</h1><p>سجل دخول الإدارة والتغييرات المحفوظة، متاح لحساب المالك المصرّح له فقط.</p></div></div>
   <div class="dev-alert" id="dev-message" role="status" aria-live="polite">جاري إعداد اتصال آمن…</div>
   <section id="dev-login" class="dev-box dev-auth" hidden>
     <h2>دخول المالك</h2>
     <p class="muted">هذه الصفحة لها حساب وكلمة مرور مستقلان عن حساب إدارة المنيو.</p>
     <form id="dev-form">
-      <label>بريد المالك الإلكتروني<input id="dev-email" type="email" autocomplete="username" required placeholder="owner@example.com"></label>
+      <label>بريد المالك الإلكتروني<input id="dev-email" type="email" autocomplete="username" required></label>
       <label>كلمة مرور Developer<input id="dev-password" type="password" autocomplete="current-password" required></label>
       <button class="primary" type="submit" id="dev-login-button">فتح السجل</button>
     </form>
@@ -55,7 +55,7 @@
   </section>
   <section id="dev-dashboard" hidden>
     <div class="dev-toolbar"><span class="dev-total" id="dev-count"></span><button type="button" class="outline" id="dev-refresh">تحديث السجل</button></div>
-    <div class="dev-alert">وقت النشاط مصدره قاعدة البيانات. اسم الموظف ونوع الجهاز معلومات يُدخلها أو يرسلها المتصفح، وليست دليلًا مستقلًا على هوية الشخص. الموقع التقريبي يظهر فقط عند الموافقة على إذن الموقع.</div>
+    <div class="dev-alert">وقت النشاط من Firebase. يظهر الموقع التقريبي في حدث تسجيل الدخول ويأتي من جهاز الموظف.</div>
     <div class="dev-list" id="dev-entries" style="margin-top:16px"></div>
     <p class="muted" id="dev-empty" hidden>لم تُسجل أنشطة بعد.</p>
   </section>
