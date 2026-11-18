@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="theme-color" content="#281731">
+  <title>Developer | حلويات مصر</title>
+  <link rel="icon" type="image/png" href="assets/logo.png">
+  <link rel="stylesheet" href="admin.css?v=104">
+  <style>
+    .dev-shell{max-width:1100px;margin:25px auto 70px;padding:0 20px}
+    .dev-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:22px}
+    .dev-heading h1{font-size:clamp(24px,3.2vw,34px);margin:5px 0}
+    .dev-heading p,.muted{color:#806e89;line-height:1.9}
+    .dev-box{background:white;border:1px solid #e8deec;border-radius:21px;padding:24px;box-shadow:0 12px 30px #2a123014}
+    .dev-auth{max-width:480px;margin:24px auto}.dev-auth h2{margin:0 0 10px}
+    .dev-auth label{display:grid;gap:5px;font-weight:700;margin-top:14px}
+    .dev-auth input{width:100%;min-height:47px;padding:10px 12px;border:1px solid #d8c8e2;border-radius:12px;font:inherit}
+    .dev-auth button{width:100%;margin-top:18px}
+    .dev-note{font-size:12px;color:#786a81}
+    .dev-toolbar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:15px}
+    .dev-total{font-size:14px;color:#664a79;font-weight:800}
+    .dev-list{display:grid;gap:11px}
+    .dev-entry{background:#fff;border:1px solid #e6ddeb;border-radius:15px;padding:15px 18px;box-shadow:0 3px 13px #25152a0b}
+    .dev-line{display:flex;align-items:center;flex-wrap:wrap;gap:8px 14px;justify-content:space-between}
+    .dev-pill{display:inline-flex;border-radius:30px;background:#eee7f2;color:#543468;padding:4px 10px;font-size:12px;font-weight:800}
+    .dev-entry h3{font-size:15px;margin:10px 0 4px}
+    .dev-entry p{font-size:13px;margin:4px 0;color:#685871;line-height:1.7;overflow-wrap:anywhere}
+    .dev-entry time{font-size:12px;color:#87738c}
+    .dev-entry .device{font-size:11px;color:#86778c}
+    .dev-alert{padding:14px 17px;background:#f5eef9;border:1px solid #e8daed;border-radius:12px;color:#4b3654;line-height:1.8}
+    @media(max-width:600px){.dev-heading{flex-direction:column}.dev-box{padding:18px}.dev-shell{padding:0 14px}}
+    [hidden]{display:none!important}
+  </style>
+  <script type="module" src="developer.js?v=104"></script>
+</head>
+<body>
+<header class="admin-header"><div class="header-inner">
+  <a class="logo" href="admin.html"><img src="assets/logo.png" alt="حلويات مصر"><span>لوحة الإدارة</span></a>
+  <div class="header-actions"><a class="header-link" href="admin.html">الرجوع للأدمن</a><button class="header-link" id="dev-logout" type="button" hidden>خروج Developer</button></div>
+</div></header>
+<main class="dev-shell">
+  <div class="dev-heading"><div><span class="intro-kicker">OWNER ACCESS</span><h1>Developer | سجل الإدارة</h1><p>سجل دخول الإدارة والتغييرات المحفوظة، متاح لحساب المالك المصرّح له فقط.</p></div></div>
+  <div class="dev-alert" id="dev-message" role="status" aria-live="polite">جاري إعداد اتصال آمن…</div>
+  <section id="dev-login" class="dev-box dev-auth" hidden>
+    <h2>دخول المالك</h2>
+    <p class="muted">هذه الصفحة لها حساب وكلمة مرور مستقلان عن حساب إدارة المنيو.</p>
+    <form id="dev-form">
+      <label>بريد المالك الإلكتروني<input id="dev-email" type="email" autocomplete="username" required placeholder="owner@example.com"></label>
+      <label>كلمة مرور Developer<input id="dev-password" type="password" autocomplete="current-password" required></label>
+      <button class="primary" type="submit" id="dev-login-button">فتح السجل</button>
+    </form>
+    <p class="dev-note">لا يتم حفظ كلمة المرور داخل الموقع. لا تشارك كلمة المرور مع العاملين على المنيو.</p>
+  </section>
+  <section id="dev-dashboard" hidden>
+    <div class="dev-toolbar"><span class="dev-total" id="dev-count"></span><button type="button" class="outline" id="dev-refresh">تحديث السجل</button></div>
+    <div class="dev-alert">وقت النشاط مصدره قاعدة البيانات. اسم الموظف ونوع الجهاز معلومات يُدخلها أو يرسلها المتصفح، وليست دليلًا مستقلًا على هوية الشخص. الموقع التقريبي يظهر فقط عند الموافقة على إذن الموقع.</div>
+    <div class="dev-list" id="dev-entries" style="margin-top:16px"></div>
+    <p class="muted" id="dev-empty" hidden>لم تُسجل أنشطة بعد.</p>
+  </section>
+</main>
+</body>
+</html>
