@@ -17,7 +17,7 @@ const txt=(tag,value,classes='')=>{const n=document.createElement(tag);n.textCon
 const validProduct=p=>p && typeof p==='object' && typeof p.id==='string' && /^[\w-]{1,70}$/.test(p.id) && categories.includes(p.category) && typeof p.ar==='string' && p.ar.trim().length>0;
 
 function makeCard(p){
-  const detail=detailCats.has(p.category);
+  const detail = p.category === 'specials' || (p.category === 'mixed-plates' && ((p.imageSource === 'asset' && !!p.image) || (p.imageSource === 'firestore' && !!p.hasImage)));
   const article=document.createElement('article');
   addClass(article,`product-card product-card--${detail?'detail':'simple'}`);
   const price=typeof p.price==='number' && Number.isFinite(p.price) && p.price>0?p.price:null;
