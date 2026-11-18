@@ -53,11 +53,31 @@ service cloud.firestore {
     }
     function validCatalogEvent(data, base) {
       return (data.type == 'catalog_seed' && hasFields(data, base, []))
-        || (data.type != 'catalog_seed' && hasFields(data, base, ['productId','imageAction'])
+        || (data.type != 'catalog_seed' && hasFields(data, base, ['productId','imageAction','details'])
           && idIsValid(data.productId)
+          && (!('details' in data) || validProductDetails(data))
           && (data.imageAction == 'none'
             || (data.imageAction == 'put' && getAfter(imagePath(data.productId)).data.updatedAt == request.time)
             || (data.imageAction == 'delete' && !existsAfter(imagePath(data.productId)))));
+    }
+    function productAt(items, index, product, id) {
+      return index is int && ((index == -1 && product == null)
+        || (index >= 0 && index < items.size() && product is map
+          && product.id == id && items[index] == product));
+    }
+    function validProductDetails(data) {
+      let details = data.details;
+      let before = get(catalogPath()).data.products;
+      let after = getAfter(catalogPath()).data.products;
+      return details is map && hasFields(details, ['before','after','beforeIndex','afterIndex'], [])
+        && productAt(before, details.beforeIndex, details.before, data.productId)
+        && productAt(after, details.afterIndex, details.after, data.productId)
+        && ((data.type == 'product_add' && details.before == null && details.after != null
+              && after.size() == before.size() + 1)
+          || (data.type == 'product_delete' && details.before != null && details.after == null
+              && after.size() == before.size() - 1)
+          || (data.type in ['product_edit','product_hide','product_show']
+              && details.before != null && details.after != null && before.size() == after.size()));
     }
     function validCatalog(data, creating) {
       return hasFields(data, ['products','updatedAt','version','auditId'], [])
