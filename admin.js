@@ -1,6 +1,4 @@
-/** Halaweyat Masr V10 — single-admin Firestore catalogue manager.
- * The admin password is NEVER part of the site files. */
-import {firebaseConfig, adminReady, adminUid, adminLoginEmail, adminUsername} from './firebase-config.js';
+import {firebaseConfig, firebaseReady} from './firebase-config.js';
 
 const $ = s=>document.querySelector(s);
 const show=(selector,value)=>{$(selector).hidden=!value;};
@@ -13,8 +11,8 @@ const CATEGORY_NAMES={
 };
 const categories=Object.keys(CATEGORY_NAMES);
 let firebaseAuth=null, authSdk=null, fs=null, db=null, unsub=null;
-let products=[], fromServer=false, currentCategory=categories[0], currentEditId=null, stagedImage=null;
-let busy=false, showingAdmin=false;
+let products=[], fromServer=false, currentCategory=categories[0], currentEditId=null, stagedImage=null, editorCatalogTime=null;
+let busy=false, showingAdmin=false, sessionId=null, catalogTime=null;
 const MAX_ITEMS=400;
 let notificationTimer;
 function notify(message,error=false){
@@ -55,7 +53,15 @@ function updateCategoryTabs(){
     button.classList.toggle('is-active',currentCategory===id);
     button.setAttribute('aria-pressed',currentCategory===id?'true':'false');
     button.append(mini('span',CATEGORY_NAMES[id]),mini('span',`${count} صنف`,'tab-count'));
-    button.addEventListener('click',()=>{currentCategory=id;updateCategoryTabs();renderItems();});tabs.append(button);
+    button.addEventListener('click',()=>{currentCategory=id;renderItems();});tabs.append(button);
+  }
+  const active=tabs.querySelector('.is-active');
+  if(active&&tabs.scrollWidth>tabs.clientWidth){
+    const bounds=tabs.getBoundingClientRect(), target=active.getBoundingClientRect();
+    if(target.left<bounds.left||target.right>bounds.right){
+      tabs.scrollBy({left:(target.left+target.right-bounds.left-bounds.right)/2,
+        behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});
+    }
   }
 }
 function renderItems(){
@@ -84,9 +90,10 @@ function renderItems(){
   }
   updateCategoryTabs();
 }
-function applyCatalog(serverProducts){
+function applyCatalog(serverProducts, updatedAt){
   if(!Array.isArray(serverProducts))return;
   products=serverProducts.filter(safeProduct).map(normalizeProduct);
+  catalogTime=updatedAt;
   fromServer=true;show('#import-banner',false);
   $('#add-product').disabled=false;
   setStatus('القائمة متصلة بـ Firebase. أي تغيير تحفظه بيظهر على منيو الزبائن.');
@@ -95,7 +102,7 @@ function applyCatalog(serverProducts){
 function parseIngredients(raw){return raw.split(/[,،\n]/).map(x=>x.trim()).filter(Boolean).slice(0,15);}
 function openEditor(item){
   if(!fromServer||busy)return;
-  currentEditId=item?.id||null;stagedImage=null;
+  currentEditId=item?.id||null;stagedImage=null;editorCatalogTime=catalogTime;
   $('#product-form').reset();
   $('#editor-title').textContent=item?'تعديل الصنف':'إضافة صنف جديد';
   $('#edit-category').value=item?.category||currentCategory;
@@ -143,29 +150,59 @@ async function shrinkImage(file){
   }
   throw new Error('الصورة كبيرة بعد الضغط. جرّب صورة أبسط أو قصّها الأول.');
 }
-async function login(username,password){
-  if(username!==adminUsername)throw new Error('بيانات الدخول غير صحيحة');
-  await authSdk.signInWithEmailAndPassword(firebaseAuth,adminLoginEmail,password);
+function approximateLocation(){
+  return new Promise((resolve,reject)=>{
+    const unavailable=()=>reject(new Error('اسمح بمشاركة الموقع من إعدادات المتصفح والجهاز وحاول مرة أخرى.'));
+    if(!navigator.geolocation){unavailable();return;}
+    navigator.geolocation.getCurrentPosition(({coords})=>{
+      resolve({lat100:Math.round(coords.latitude*100),lng100:Math.round(coords.longitude*100)});
+    },unavailable,{enableHighAccuracy:false,timeout:10000,maximumAge:0});
+  });
 }
-async function saveCatalog(nextItems, imageAction=null){
-  if(busy||!fromServer||!firebaseAuth?.currentUser||firebaseAuth.currentUser.uid!==adminUid)throw new Error('صلاحية الإدارة غير متاحة');
+function auditEvent(type, details={}){
+  return {type,actorUid:firebaseAuth.currentUser.uid,actorEmail:firebaseAuth.currentUser.email,sessionId,createdAt:fs.serverTimestamp(),...details};
+}
+async function login(email,password){
+  const location=await approximateLocation();
+  const {user}=await authSdk.signInWithEmailAndPassword(firebaseAuth,email,password);
+  try{
+    const role=await fs.getDocFromServer(fs.doc(db,'auditRoles',user.uid));
+    if(role.data()?.role!=='staff')throw new Error('هذا الحساب ليس حساب موظف مصرح له.');
+    sessionId=crypto.randomUUID();
+    const token=await authSdk.getIdTokenResult(user);
+    await fs.setDoc(fs.doc(db,'auditLogs',sessionId),auditEvent('login',{location,authTime:token.claims.auth_time}));
+    await openDashboard(user);
+  }catch(error){
+    sessionId=null;
+    await authSdk.signOut(firebaseAuth);
+    throw error;
+  }
+}
+async function saveCatalog(nextItems, type, productId, imageAction=null){
+  if(busy||!fromServer||!showingAdmin)return;
   if(nextItems.length>MAX_ITEMS)throw new Error('وصلنا للحد الأقصى 400 صنف في النسخة دي');
   const items=nextItems.map(normalizeProduct);
+  const expectedTime=catalogTime;
+  const auditRef=fs.doc(fs.collection(db,'auditLogs'));
+  const event=auditEvent(type,{productId,imageAction:imageAction?.type||'none'});
   setBusy(true);
-  try {
-    const batch=fs.writeBatch(db);
+  try{
     const ref=fs.doc(db,'menu','catalog');
-    batch.set(ref,{products:items,version:10,updatedAt:fs.serverTimestamp()});
-    if(imageAction){
-      const imageRef=fs.doc(db,'menuImages',imageAction.id);
-      if(imageAction.type==='put')batch.set(imageRef,{dataUrl:imageAction.dataUrl,updatedAt:fs.serverTimestamp()});
-      if(imageAction.type==='delete')batch.delete(imageRef);
-    }
-    await batch.commit();
-    products=items;
-    renderItems();
+    await fs.runTransaction(db,async transaction=>{
+      const snapshot=await transaction.get(ref);
+      if(!expectedTime?.isEqual(snapshot.data()?.updatedAt)){
+        throw new Error('موظف آخر عدّل المنيو. افتح الصنف من جديد قبل الحفظ.');
+      }
+      transaction.set(ref,{products:items,version:10,updatedAt:fs.serverTimestamp(),auditId:auditRef.id});
+      transaction.set(auditRef,event);
+      if(imageAction){
+        const imageRef=fs.doc(db,'menuImages',productId);
+        if(imageAction.type==='put')transaction.set(imageRef,{dataUrl:imageAction.dataUrl,updatedAt:fs.serverTimestamp()});
+        else transaction.delete(imageRef);
+      }
+    });
     notify('تم حفظ التعديلات بنجاح.');
-  }catch(e){console.error(e);notify('الحفظ لم يتم: '+(e.code||e.message||'راجع الاتصال وقواعد Firestore'),true);throw e;}
+  }catch(e){notify('الحفظ لم يتم: '+(e.message||e.code),true);throw e;}
   finally{setBusy(false);}
 }
 async function saveProduct(event){
@@ -173,6 +210,7 @@ async function saveProduct(event){
   const ar=$('#edit-ar').value.trim(), en=$('#edit-en').value.trim()||ar;
   const cost=$('#edit-price').value.trim();const price=cost?Number(cost):null;
   if(!ar || ar.length>95 || (cost&&(!Number.isFinite(price)||price<=0||price>100000)))return notify('راجع الاسم والسعر.',true);
+  if(!editorCatalogTime?.isEqual(catalogTime))return notify('المنيو اتحدّث. افتح الصنف من جديد قبل الحفظ.',true);
   const original=products.find(p=>p.id===currentEditId);
   const id=original?.id||`custom-${crypto.randomUUID()}`;
   const imageAction=stagedImage?{type:'put',id,dataUrl:stagedImage}:original?.imageSource==='firestore'&&$('#edit-remove-image').checked?{type:'delete',id}:null;
@@ -189,14 +227,14 @@ async function saveProduct(event){
     code:original?.code||'',origin:original?.origin||'admin'
   };
   const next=original?products.map(p=>p.id===id?newItem:p):[...products,newItem];
-  try{await saveCatalog(next,imageAction);$('#product-dialog').close();currentCategory=newItem.category;renderItems();}
+  try{await saveCatalog(next,original?'product_edit':'product_add',id,imageAction);$('#product-dialog').close();currentCategory=newItem.category;renderItems();}
   catch(e){}
 }
-async function toggleVisible(p){if(busy)return;try{await saveCatalog(products.map(x=>x.id===p.id?{...x,active:!x.active}:x));}catch(e){}}
+async function toggleVisible(p){if(busy)return;try{await saveCatalog(products.map(x=>x.id===p.id?{...x,active:!x.active}:x),p.active?'product_hide':'product_show',p.id);}catch(e){}}
 async function removeProduct(p){
   if(busy||!window.confirm(`هل تريد حذف «${p.ar}» نهائيًا؟ ممكن تستخدم إخفاء بدل الحذف.`))return;
   const action=p.imageSource==='firestore'?{type:'delete',id:p.id}:null;
-  try{await saveCatalog(products.filter(x=>x.id!==p.id),action);}catch(e){}
+  try{await saveCatalog(products.filter(x=>x.id!==p.id),'product_delete',p.id,action);}catch(e){}
 }
 function backup(){const data=new Blob([JSON.stringify({version:10,createdAt:new Date().toISOString(),products},null,2)],{type:'application/json;charset=utf-8'});
   const url=URL.createObjectURL(data);const a=document.createElement('a');a.href=url;a.download='halaweyat-masr-menu-backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),2000);
@@ -204,7 +242,7 @@ function backup(){const data=new Blob([JSON.stringify({version:10,createdAt:new 
 async function init(){
   try{localCatalog=await loadBundledCatalog();products=localCatalog;renderItems();}
   catch(e){show('#loading',false);show('#setup',true);$('#setup-message').textContent='ملف menu-products.json غير موجود أو غير صحيح';return;}
-  if(!adminReady){show('#loading',false);show('#setup',true);return;}
+  if(!firebaseReady){show('#loading',false);show('#setup',true);return;}
   try{
     const [app,authentication,firestore]=await Promise.all([
       import('https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js'),
@@ -212,45 +250,56 @@ async function init(){
       import('https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js')
     ]);
     authSdk=authentication;fs=firestore;
-    const instance=app.getApps().length?app.getApp():app.initializeApp(firebaseConfig);
-    firebaseAuth=authentication.getAuth(instance);db=firestore.getFirestore(instance);
-    // The administration session is intentionally memory-only. Leaving/reloading
-    // the page discards it, and any previously remembered login is invalidated.
-    // Never store passwords or a second access code in client-side files.
-    try {
-      await authentication.setPersistence(firebaseAuth,authentication.inMemoryPersistence);
-      await authentication.signOut(firebaseAuth);
-    } catch(e) {
-      console.error('Unable to enforce secure admin session',e);
-      show('#loading',false);show('#setup',true);
-      $('#setup-message').textContent='تعذر تأمين جلسة الإدارة. أعد تحميل الصفحة وحاول مرة أخرى.';
-      return;
-    }
+    const instance=app.initializeApp(firebaseConfig,'staff-admin-panel');
+    firebaseAuth=authentication.initializeAuth(instance,{persistence:authentication.inMemoryPersistence});
+    db=firestore.getFirestore(instance);
     authentication.onAuthStateChanged(firebaseAuth,user=>{
-      if(unsub){unsub();unsub=null;}
-      show('#loading',false);
-      const isAdmin=Boolean(user&&user.uid===adminUid);
-      showingAdmin=isAdmin;show('#login-panel',!isAdmin && !user);show('#dashboard',isAdmin);show('#logout',Boolean(user));
-      if(user && !isAdmin){show('#login-panel',false);notify('هذا الحساب ليس حساب الأدمن المصرح له. سجل الخروج.',true);return;}
-      if(!isAdmin)return;
-      setStatus('جاري قراءة بيانات المنيو من Firebase…');
-      unsub=firestore.onSnapshot(firestore.doc(db,'menu','catalog'),snapshot=>{
-        if(snapshot.exists() && Array.isArray(snapshot.data().products))applyCatalog(snapshot.data().products);
-        else{
-          products=[...localCatalog];fromServer=false;show('#import-banner',true);$('#add-product').disabled=true;
-          setStatus('المنيو السحابي فارغ. اضغط نشر أصناف الشيت مرة واحدة.');renderItems();
-        }
-      },e=>{console.error(e);setStatus('تعذر قراءة المنيو السحابي. تأكد من نشر Firestore Rules الخاصة بـ V10.');notify('خطأ في قاعدة البيانات: '+(e.code||e.message),true);});
+      if(user)return;
+      unsub?.();unsub=null;
+      showingAdmin=false;sessionId=null;fromServer=false;catalogTime=null;
+      if($('#product-dialog').open)$('#product-dialog').close();
+      show('#loading',false);show('#login-panel',true);show('#dashboard',false);show('#logout',false);
     });
   }catch(e){console.error(e);show('#loading',false);show('#setup',true);$('#setup-message').textContent='تعذر تحميل Firebase. افتح الموقع على HTTPS وراجع الإنترنت.';}
 }
+function openDashboard(user){
+  if(firebaseAuth.currentUser!==user)throw new Error('الجلسة انتهت. سجل الدخول من جديد.');
+  showingAdmin=true;
+  show('#login-panel',false);show('#dashboard',true);show('#logout',true);
+  setStatus('جاري قراءة بيانات المنيو من Firebase…');
+  unsub=fs.onSnapshot(fs.doc(db,'menu','catalog'),{includeMetadataChanges:true},snapshot=>{
+    if(snapshot.metadata.fromCache||snapshot.metadata.hasPendingWrites)return;
+    const data=snapshot.data();
+    if(Array.isArray(data?.products)){
+      if(!catalogTime?.isEqual(data.updatedAt))applyCatalog(data.products,data.updatedAt);
+    }else if(!snapshot.exists()){
+      products=[...localCatalog];fromServer=false;show('#import-banner',true);$('#add-product').disabled=true;
+      setStatus('المنيو السحابي فارغ. اضغط نشر أصناف الشيت مرة واحدة.');renderItems();
+    }
+  },()=>{setStatus('تعذر قراءة المنيو السحابي.');});
+}
 $('#login-form').addEventListener('submit',async e=>{
   e.preventDefault();const btn=$('#login-button');btn.disabled=true;btn.textContent='جاري الدخول…';
-  try{await login($('#username').value.trim(),$('#password').value);$('#password').value='';}
-  catch(error){notify('اسم المستخدم أو كلمة المرور غير صحيحة، أو تسجيل الدخول محظور للدومين الحالي.',true);}
-  finally{btn.disabled=false;btn.textContent='تسجيل الدخول';}
+  try{await login($('#staff-email').value.trim(),$('#password').value);}
+  catch(error){notify(error.code?'تعذر تسجيل الدخول. راجع بيانات الحساب وإعدادات الاتصال.':error.message,true);}
+  finally{$('#password').value='';btn.disabled=false;btn.textContent='السماح بالموقع وتسجيل الدخول';}
 });
-$('#logout').addEventListener('click',()=>authSdk?.signOut(firebaseAuth));
+$('#logout').addEventListener('click',async()=>{
+  if(!showingAdmin||busy)return;
+  showingAdmin=false;
+  show('#dashboard',false);show('#logout',false);
+  let timeout;
+  try{
+    await Promise.race([
+      fs.addDoc(fs.collection(db,'auditLogs'),auditEvent('logout')),
+      new Promise(resolve=>{timeout=setTimeout(resolve,3000);})
+    ]);
+  }catch(error){console.warn('Logout event could not be saved',error.code);}
+  finally{
+    clearTimeout(timeout);
+    await authSdk.signOut(firebaseAuth).catch(()=>location.reload());
+  }
+});
 $('#product-search').addEventListener('input',renderItems);
 $('#add-product').addEventListener('click',()=>openEditor(null));
 $('#close-dialog').addEventListener('click',closeEditor);
@@ -276,10 +325,13 @@ $('#seed-button').addEventListener('click',async()=>{
   setBusy(true);$('#seed-button').textContent='جاري النشر…';
   try{
     const ref=fs.doc(db,'menu','catalog');
+    const auditRef=fs.doc(fs.collection(db,'auditLogs'));
+    const event=auditEvent('catalog_seed');
     await fs.runTransaction(db,async transaction=>{
       const snap=await transaction.get(ref);
       if(snap.exists())throw new Error('القائمة موجودة بالفعل؛ لن يتم استبدال بيانات الأدمن');
-      transaction.set(ref,{products:localCatalog,version:10,updatedAt:fs.serverTimestamp()});
+      transaction.set(ref,{products:localCatalog,version:10,updatedAt:fs.serverTimestamp(),auditId:auditRef.id});
+      transaction.set(auditRef,event);
     });
     notify('تم نشر أصناف الشيت بنجاح. ظهرت الآن في المنيو السحابي.');
   }catch(e){notify('تعذر نشر الأصناف: '+(e.code||e.message),true);}
