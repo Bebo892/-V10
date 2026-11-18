@@ -123,6 +123,22 @@ $('#dev-form').addEventListener('submit',async event=>{
 });
 $('#dev-logout').addEventListener('click',()=>logout());
 $('#dev-refresh').addEventListener('click',loadEvents);
+$('#dev-reset-password').addEventListener('click',async event=>{
+  const email=$('#dev-email');
+  if(!email.reportValidity())return;
+  const button=event.currentTarget;
+  button.disabled=true;
+  const sent='لو البريد مرتبط بحساب، هيوصلك رابط لتعيين كلمة المرور.';
+  try{
+    await sdk.sendPasswordResetEmail(auth,email.value.trim());
+    message(sent);
+  }catch(error){
+    if(error.code==='auth/user-not-found')message(sent);
+    else message('تعذر إرسال الرابط. حاول مرة أخرى بعد قليل.',true);
+  }finally{
+    button.disabled=false;
+  }
+});
 window.addEventListener('pagehide',clearOwner);
 window.addEventListener('pageshow',event=>{if(event.persisted&&auth)logout();});
 start();
