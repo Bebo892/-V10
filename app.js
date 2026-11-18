@@ -73,7 +73,7 @@
       priceRanges: {all:'كل الأسعار', under50:'أقل من 50 جنيه', between:'50 – 100 جنيه', over100:'أكثر من 100 جنيه'},
       priceFilterAria: 'فلترة الأصناف حسب السعر', noMatchesReset: 'مسح الفلاتر',
       footerContactTitle: 'تواصل مع الكافيه', footerContactDesc: 'للاستفسارات أو معرفة تفاصيل الفروع:',
-      footerMap: 'عرض الموقع على Google Maps', footerCity: 'الإسكندرية، مصر', adminLink: 'دخول الإدارة'
+      footerMap: 'عرض الموقع على Google Maps', footerCity: 'الإسكندرية، مصر', adminLink: 'Main Admin'
     },
     en: {
       title: 'Café Menu | Halaweyat Masr', skip: 'Skip to menu', brand: 'Halaweyat Masr Café', menu: 'Categories',
@@ -95,7 +95,7 @@
       priceRanges: {all:'All prices', under50:'Under EGP 50', between:'EGP 50 – 100', over100:'Over EGP 100'},
       priceFilterAria: 'Filter menu by price', noMatchesReset: 'Clear filters',
       footerContactTitle: 'Contact the café', footerContactDesc: 'Questions or branch information? Call us:',
-      footerMap: 'View on Google Maps', footerCity: 'Alexandria, Egypt', adminLink: 'Admin login'
+      footerMap: 'View on Google Maps', footerCity: 'Alexandria, Egypt', adminLink: 'Main Admin'
     }
   };
   const state = { lang: 'ar', category: 'all', price: 'all', query: '', activeProduct: null };
