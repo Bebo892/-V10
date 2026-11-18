@@ -85,6 +85,34 @@ service cloud.firestore {
         && data.updatedAt == request.time;
     }
 
+    function ownAnonymousVisit(uid) {
+      return request.auth != null && request.auth.uid == uid
+        && request.auth.token.firebase.sign_in_provider == 'anonymous';
+    }
+    function isCurrentCairoDay(day) {
+      // Cairo uses UTC+2 or UTC+3, depending on the season.
+      return day.matches('^[1-9][0-9]{0,5}$')
+        && request.time.toMillis() >= int(day) * 86400000 - 10800000
+        && request.time.toMillis() < (int(day) + 1) * 86400000 - 7200000;
+    }
+    function validStatsSections(sections) {
+      return sections is map && sections.keys().hasOnly([
+        'hot-drinks','cold-drinks','dessert-cups','mixed-plates','specials'
+      ]) && sections.values().hasOnly([true]);
+    }
+    match /menuStats/{day}/visitors/{uid} {
+      allow get: if ownAnonymousVisit(uid) || hasRole('owner');
+      allow list: if hasRole('owner');
+      allow create: if ownAnonymousVisit(uid) && isCurrentCairoDay(day)
+        && hasFields(request.resource.data, ['createdAt','sections'], [])
+        && request.resource.data.createdAt == request.time
+        && validStatsSections(request.resource.data.sections);
+      allow update: if ownAnonymousVisit(uid) && isCurrentCairoDay(day)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['sections'])
+        && validStatsSections(request.resource.data.sections)
+        && request.resource.data.sections.keys().hasAll(resource.data.sections.keys());
+    }
+
     match /auditRoles/{uid} {
       allow get: if request.auth != null && request.auth.uid == uid;
     }
