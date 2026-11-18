@@ -8,13 +8,17 @@
   <title>إدارة منيو حلويات مصر</title>
   <link rel="icon" type="image/png" href="assets/logo.png">
   <link rel="stylesheet" href="admin.css">
-  <script type="module" src="admin.js?v=session-security-2"></script>
+  <script type="module" src="admin.js?v=audit-1"></script>
 </head>
 <body>
 <header class="admin-header">
   <div class="header-inner">
     <a href="index.html" class="logo"><img src="assets/logo.png" alt="شعار حلويات مصر"><span>إدارة منيو الكافيه</span></a>
-    <div class="header-actions"><a class="header-link" href="index.html">عرض المنيو</a><button class="header-link" type="button" id="logout" hidden>تسجيل الخروج</button></div>
+    <div class="header-actions">
+      <a class="header-link" href="index.html">عرض المنيو</a>
+      <a class="header-link" href="developer.html">دخول المالك</a>
+      <button class="header-link" type="button" id="logout" hidden>تسجيل الخروج</button>
+    </div>
   </div>
 </header>
 <main class="main-area">
@@ -22,11 +26,11 @@
   <section class="panel" id="loading" aria-live="polite">جاري الاتصال بلوحة الإدارة…</section>
   <section class="panel" id="setup" hidden><h2>مشكلة في الاتصال</h2><p id="setup-message">راجع إعدادات Firebase والإنترنت.</p></section>
   <section class="panel login-panel" id="login-panel" hidden>
-    <div class="login-icon" aria-hidden="true">♙</div><h2>دخول الأدمن</h2><p>ادخل باسم المستخدم وكلمة المرور الخاصة بالإدارة.</p>
+    <div class="login-icon" aria-hidden="true">♙</div><h2>دخول الأدمن</h2><p>ادخل بالبريد وكلمة المرور الخاصة بحسابك. مشاركة الموقع التقريبي مطلوبة مرة واحدة عند تسجيل الدخول وتظهر للمالك في سجل النشاط.</p>
     <form id="login-form">
-      <label for="username">اسم المستخدم</label><input id="username" name="username" type="text" placeholder="admin" autocomplete="username" autocapitalize="none" required>
+      <label for="staff-email">البريد الإلكتروني للموظف</label><input id="staff-email" name="email" type="email" autocomplete="username" autocapitalize="none" required>
       <label for="password">كلمة المرور</label><input id="password" name="password" type="password" autocomplete="current-password" required>
-      <button id="login-button" type="submit" class="primary">تسجيل الدخول</button>
+      <button id="login-button" type="submit" class="primary">السماح بالموقع وتسجيل الدخول</button>
     </form>
   </section>
   <section id="dashboard" hidden>

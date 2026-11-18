@@ -1,40 +1,114 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    function isAdmin() {
-      return request.auth != null && request.auth.uid == 'xYTJRUX7bMMdIkoepGViPhmIrsw2';
+    // auditRoles/{Auth UID}: { role: 'owner' | 'staff' }, provisioned in Firebase Console.
+    function hasRole(role) {
+      return request.auth != null
+        && get(/databases/$(database)/documents/auditRoles/$(request.auth.uid)).data.role == role;
     }
-    // V10: public menu catalog. The first write imports 120 items from the Excel sheet.
+    function auditPath(id) {
+      return /databases/$(database)/documents/auditLogs/$(id);
+    }
+    function catalogPath() {
+      return /databases/$(database)/documents/menu/catalog;
+    }
+    function imagePath(id) {
+      return /databases/$(database)/documents/menuImages/$(id);
+    }
+    function idIsValid(id) {
+      return id is string && id.matches('^[a-zA-Z0-9_-]{1,70}$');
+    }
+    function hasFields(data, required, optional) {
+      return data.keys().hasAll(required) && data.keys().hasOnly(required.concat(optional));
+    }
+    function validLocation(location) {
+      return location is map && hasFields(location, ['lat100','lng100'], [])
+        && location.lat100 is int && location.lat100 >= -9000 && location.lat100 <= 9000
+        && location.lng100 is int && location.lng100 >= -18000 && location.lng100 <= 18000;
+    }
+    function validSession(id) {
+      let event = get(auditPath(id)).data;
+      return event.type == 'login' && event.actorUid == request.auth.uid
+        && event.authTime == request.auth.token.auth_time;
+    }
+    function validAudit(data, eventId) {
+      let base = ['actorUid','actorEmail','type','sessionId','createdAt'];
+      return data.keys().hasAll(base) && data.actorUid == request.auth.uid
+        && data.actorEmail is string && data.actorEmail == request.auth.token.email
+        && idIsValid(data.sessionId) && data.createdAt == request.time
+        && ((data.type == 'login' && eventId == data.sessionId
+              && hasFields(data, base, ['location','authTime']) && validLocation(data.location)
+              && data.authTime is int && data.authTime == request.auth.token.auth_time)
+          || (data.type != 'login' && validSession(data.sessionId)
+              && ((data.type == 'logout' && hasFields(data, base, []))
+                || (isCatalogEvent(data.type) && linkedCatalog(eventId)
+                    && validCatalogEvent(data, base)))));
+    }
+    function isCatalogEvent(type) {
+      return type in ['catalog_seed','product_add','product_edit','product_hide','product_show','product_delete'];
+    }
+    function linkedCatalog(eventId) {
+      let after = getAfter(catalogPath()).data;
+      return after.auditId == eventId && after.updatedAt == request.time;
+    }
+    function validCatalogEvent(data, base) {
+      return (data.type == 'catalog_seed' && hasFields(data, base, []))
+        || (data.type != 'catalog_seed' && hasFields(data, base, ['productId','imageAction'])
+          && idIsValid(data.productId)
+          && (data.imageAction == 'none'
+            || (data.imageAction == 'put' && getAfter(imagePath(data.productId)).data.updatedAt == request.time)
+            || (data.imageAction == 'delete' && !existsAfter(imagePath(data.productId)))));
+    }
+    function validCatalog(data, creating) {
+      return hasFields(data, ['products','updatedAt','version','auditId'], [])
+        && data.products is list && data.products.size() <= 400
+        && data.version is int && data.version == 10 && data.updatedAt == request.time
+        && idIsValid(data.auditId) && !exists(auditPath(data.auditId))
+        && catalogAuditMatches(data.auditId, creating);
+    }
+    function catalogAuditMatches(id, creating) {
+      let event = getAfter(auditPath(id)).data;
+      return event.actorUid == request.auth.uid && event.createdAt == request.time
+        && isCatalogEvent(event.type) && (event.type == 'catalog_seed') == creating;
+    }
+    function imageAuditMatches(id, action) {
+      let catalog = getAfter(catalogPath()).data;
+      let event = getAfter(auditPath(catalog.auditId)).data;
+      return catalog.updatedAt == request.time && !exists(auditPath(catalog.auditId))
+        && event.createdAt == request.time && event.actorUid == request.auth.uid
+        && event.productId == id && event.imageAction == action;
+    }
+    function validImage(data) {
+      return hasFields(data, ['dataUrl','updatedAt'], [])
+        && data.dataUrl is string && data.dataUrl.size() < 100000
+        && data.dataUrl.matches('^data:image/(webp|jpeg);base64,[A-Za-z0-9+/=]+$')
+        && data.updatedAt == request.time;
+    }
+
+    match /auditRoles/{uid} {
+      allow get: if request.auth != null && request.auth.uid == uid;
+    }
+    match /auditLogs/{eventId} {
+      allow get: if hasRole('owner');
+      allow list: if hasRole('owner') && request.query.limit <= 100;
+      allow create: if hasRole('staff') && validAudit(request.resource.data, eventId);
+    }
     match /menu/catalog {
       allow get: if true;
-      allow list: if false;
-      allow create, update: if isAdmin()
-        && request.resource.data.keys().hasOnly(['products','updatedAt','version'])
-        && request.resource.data.keys().hasAll(['products','updatedAt','version'])
-        && request.resource.data.products is list
-        && request.resource.data.products.size() <= 400
-        && request.resource.data.version is int
-        && request.resource.data.updatedAt is timestamp;
-      allow delete: if false;
+      allow create: if hasRole('staff') && validCatalog(request.resource.data, true);
+      allow update: if hasRole('staff') && validCatalog(request.resource.data, false);
     }
-    // Keep older V9 price document secure, but V10 doesn't write it.
     match /menu/prices {
       allow get: if true;
-      allow list: if false;
-      allow write: if false;
     }
-    // Photos are compressed small thumbnails, never full-size originals.
     match /menuImages/{itemId} {
       allow get: if true;
-      allow list: if false;
-      allow create, update: if isAdmin()
-        && request.resource.data.keys().hasOnly(['dataUrl','updatedAt'])
-        && request.resource.data.keys().hasAll(['dataUrl','updatedAt'])
-        && request.resource.data.dataUrl is string
-        && request.resource.data.dataUrl.size() < 155000
-        && request.resource.data.updatedAt is timestamp;
-      allow delete: if isAdmin();
+      allow create, update: if hasRole('staff') && validImage(request.resource.data)
+        && imageAuditMatches(itemId, 'put');
+      allow delete: if hasRole('staff') && imageAuditMatches(itemId, 'delete');
     }
-    match /{document=**} { allow read, write: if false; }
+    match /{document=**} {
+      allow read, write: if false;
+    }
   }
 }
