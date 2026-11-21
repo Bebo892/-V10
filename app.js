@@ -112,13 +112,19 @@
     aliases: card.dataset.aliases || ''
   });
   let products = $$('.product-card').map(makeProduct);
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const layeredFeaturedMotion = window.matchMedia('(min-width: 651px) and (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)');
-  const featuredObserver = 'IntersectionObserver' in window && layeredFeaturedMotion.matches
+  const featuredObserver = 'IntersectionObserver' in window && !prefersReducedMotion.matches
     ? new IntersectionObserver(entries => {
       entries.forEach(({ target, isIntersecting }) => {
         if (!isIntersecting || !target.isConnected) return;
-        target.classList.add('featured-row-enter');
         featuredObserver.unobserve(target);
+        target.classList.add('featured-row-enter');
+        if (!layeredFeaturedMotion.matches && !prefersReducedMotion.matches) {
+          target.classList.add('featured-touch-enter');
+          // Clear the trigger even if the row is filtered out mid-animation.
+          window.setTimeout(() => target.classList.remove('featured-touch-enter'), 980);
+        }
       });
     }, { threshold: .2 }) : null;
   function observeFeaturedRows() {
@@ -575,7 +581,6 @@
   products.forEach(bindCardClick);
   // Fade the text out, swap RTL/LTR at the midpoint, then bring it back in.
   // The original brown/gold hero remains; the decorative coffee was intentionally removed.
-  const prefersReducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)');
   let switchingLanguage = false;
   languageToggle.addEventListener('click', () => {
     if (switchingLanguage) return;

@@ -1663,6 +1663,11 @@ html[dir="ltr"] .product-tap:focus-visible .details-arrow { transform: scaleX(-1
     backdrop-filter: none;
   }
   @media (prefers-reduced-motion: no-preference) {
+    #specials .featured-touch-enter .photo-visual img,
+    #specials .featured-touch-enter .product-info {
+      animation: featured-touch-entrance .74s cubic-bezier(.22,.65,.28,1) backwards;
+    }
+    #specials .featured-touch-enter .product-info { animation-delay: .16s; }
     .product-dialog.is-featured[open] {
       animation: featured-touch-dialog-in .45s ease-out both;
     }
@@ -1670,6 +1675,9 @@ html[dir="ltr"] .product-tap:focus-visible .details-arrow { transform: scaleX(-1
       animation: featured-touch-dialog-out .32s ease-in-out both;
     }
   }
+}
+@keyframes featured-touch-entrance {
+  from { opacity: .5; transform: translateY(14px); }
 }
 @keyframes featured-touch-dialog-in {
   from { opacity: 0; transform: translateY(28px); }
