@@ -6,19 +6,31 @@ import {firebaseConfig, firebaseReady} from './firebase-config.js';
 
 const categories = ['hot-drinks','cold-drinks','dessert-cups','mixed-plates','specials'];
 const detailCats = new Set(['mixed-plates','specials']);
+const featuredCardPhotos = new Set([
+  'assets/products/lejua.webp',
+  'assets/products/coco-choc.webp',
+  'assets/products/dessert-dousser.webp',
+  'assets/products/banana-split.webp',
+  'assets/products/dame-blanche.webp',
+  'assets/products/peche-melba.webp',
+  'assets/products/choco-pistache.webp'
+]);
 const imageCache = new Map();
 const imageVersions = new Map();
+const imageRequests = new Map();
 const $ = (q,root=document)=>root.querySelector(q);
 const svgArrow = '<svg aria-hidden="true" class="details-arrow" fill="none" focusable="false" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 12H5m0 0 6-6m-6 6 6 6" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.85"></path></svg>';
 let dbApi, db;
 const isImageData = value=>typeof value==='string' && /^data:image\/(webp|jpeg|png);base64,[A-Za-z0-9+/=]+$/.test(value) && value.length < 155000;
 const addClass = (node,classes) => node.className=classes;
 const txt=(tag,value,classes='')=>{const n=document.createElement(tag);n.textContent=String(value??'');if(classes)n.className=classes;return n;};
-const versionedAsset=path=>typeof path==='string'&&path.startsWith('assets/products/')?path+(path.includes('?')?'&':'?')+'v=103-2':path;
+const versionedAsset=(path,version='103-2')=>typeof path==='string'&&path.startsWith('assets/products/')?path+(path.includes('?')?'&':'?')+'v='+version:path;
 const validProduct=p=>p && typeof p==='object' && typeof p.id==='string' && /^[\w-]{1,70}$/.test(p.id) && categories.includes(p.category) && typeof p.ar==='string' && p.ar.trim().length>0;
 
 function makeCard(p){
-  const detail = p.category === 'specials' || (p.category === 'mixed-plates' && ((p.imageSource === 'asset' && !!p.image) || (p.imageSource === 'firestore' && !!p.hasImage)));
+  const featured = p.category === 'specials';
+  const hasFeaturedPhoto = featured && p.imageSource==='asset' && featuredCardPhotos.has(p.image);
+  const detail = featured || (p.category === 'mixed-plates' && ((p.imageSource === 'asset' && !!p.image) || (p.imageSource === 'firestore' && !!p.hasImage)));
   const article=document.createElement('article');
   addClass(article,`product-card product-card--${detail?'detail':'simple'}`);
   const price=typeof p.price==='number' && Number.isFinite(p.price) && p.price>0?p.price:null;
@@ -28,7 +40,7 @@ function makeCard(p){
     descriptionAr:p.descriptionAr||'',descriptionEn:p.descriptionEn||'',
     ingredientsAr:(Array.isArray(p.ingredientsAr)?p.ingredientsAr:[]).join('|'),
     ingredientsEn:(Array.isArray(p.ingredientsEn)?p.ingredientsEn:[]).join('|'),
-    image:p.imageSource==='asset' && p.image?versionedAsset(p.image):''
+    image:p.imageSource==='asset' && p.image?versionedAsset(p.image,hasFeaturedPhoto?'featured-gold-1':undefined):''
   });
   if(p.imageSource==='firestore' && p.hasImage) article.dataset.cloudImage=p.id;
   const priceSpan=txt('span', price===null?'':price,'price');
@@ -50,8 +62,16 @@ function makeCard(p){
   const cloud=p.imageSource==='firestore' && p.hasImage;
   if((p.imageSource==='asset' && p.image)||cloud){
     addClass(visual,'product-visual photo-visual'+(cloud?' photo-visual--pending':''));
-    if(!cloud){const img=document.createElement('img');img.src=versionedAsset(p.image);img.alt=p.ar;img.loading='lazy';visual.append(img);}
-    else visual.append(txt('span','جاري تحميل الصورة…','plate-visual-caption'));
+    if(!cloud){
+      const img=document.createElement('img');
+      img.alt=p.ar;
+      img.loading=featured?'eager':'lazy';
+      img.decoding='async';
+      img.src=hasFeaturedPhoto
+        ? versionedAsset(p.image.replace('assets/products/','assets/products/cards/'),'featured-gold-1')
+        : article.dataset.image;
+      visual.append(img);
+    }else visual.append(txt('span','جاري تحميل الصورة…','plate-visual-caption'));
   }else{
     addClass(visual,'product-visual plate-visual');
     visual.append(txt('span','✧','plate-visual-mark'),txt('span','من أطباق الكافيه','plate-visual-caption'));
@@ -71,14 +91,23 @@ function applyImage(id,dataUrl){
 async function getImage(id){
   if(imageCache.has(id))return applyImage(id,imageCache.get(id));
   if(!dbApi||!db)return;
+  const version=imageVersions.get(id);
+  if(!imageVersions.has(id) || imageRequests.get(id)?.version===version)return;
+  const request={version};
+  imageRequests.set(id,request);
   try{
     const snap=await dbApi.getDoc(dbApi.doc(db,'menuImages',id));
-    if(snap.exists())applyImage(id,snap.data().dataUrl);
+    if(imageRequests.get(id)===request && imageVersions.get(id)===version && snap.exists()){
+      applyImage(id,snap.data().dataUrl);
+    }
   }catch(e){console.warn('Thumbnail unavailable',id,e.code||e.message);}
+  finally{if(imageRequests.get(id)===request)imageRequests.delete(id);}
 }
 let observer;
 function queueImages(cards){
   observer?.disconnect();
+  const nearbyCards=cards.filter(card=>card.dataset.category!=='specials');
+  cards.filter(card=>card.dataset.category==='specials').forEach(card=>getImage(card.dataset.cloudImage));
   if('IntersectionObserver' in window){
     observer=new IntersectionObserver(entries=>{
       entries.filter(entry=>entry.isIntersecting).forEach(entry=>{
@@ -86,8 +115,8 @@ function queueImages(cards){
         getImage(entry.target.dataset.cloudImage);
       });
     },{rootMargin:'260px'});
-    cards.forEach(card=>observer.observe(card));
-  }else cards.forEach(card=>getImage(card.dataset.cloudImage));
+    nearbyCards.forEach(card=>observer.observe(card));
+  }else nearbyCards.forEach(card=>getImage(card.dataset.cloudImage));
 }
 function showCatalog(items){
   if(!Array.isArray(items))return;
@@ -101,7 +130,11 @@ function showCatalog(items){
       if(imageVersions.has(p.id) && imageVersions.get(p.id)!==v)imageCache.delete(p.id);
       imageVersions.set(p.id,v);
     } else {imageVersions.delete(p.id);imageCache.delete(p.id);}
-    const card=makeCard(p);buckets.get(p.category).append(card);if(card.dataset.cloudImage)cards.push(card);
+    const card=makeCard(p);
+    const bucket=buckets.get(p.category);
+    if(p.category==='specials' && p.id==='specials-533')bucket.prepend(card);
+    else bucket.append(card);
+    if(card.dataset.cloudImage)cards.push(card);
   });
   for(const c of categories){
     const grid=$(`#${c} .products-grid`);

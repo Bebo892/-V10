@@ -143,7 +143,8 @@
       visual.classList.remove('plate-visual','photo-visual--pending');
       visual.classList.add('photo-visual');
       visual.replaceChildren();
-      const img=document.createElement('img');img.src=image;img.alt=displayName(product);img.loading='lazy';
+      const img=document.createElement('img');img.alt=displayName(product);
+      img.loading=product.category==='specials'?'eager':'lazy';img.src=image;
       visual.append(img);
     }
     const thumb=$('.simple-thumb',product.card);
@@ -384,7 +385,17 @@
   }
 
   function closeDetails() {
-    if (dialog.open) dialog.close();
+    if (!dialog.open || dialog.classList.contains('is-closing')) return;
+    if (!dialog.classList.contains('is-featured') || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      dialog.close();
+      return;
+    }
+    dialog.classList.add('is-closing');
+    const animation = dialogVisual.getAnimations?.().find(item => item.animationName === 'featured-photo-out');
+    if (animation) {
+      const finish = () => { if (dialog.open && dialog.classList.contains('is-closing')) dialog.close(); };
+      animation.finished.then(finish, finish);
+    } else dialog.close();
   }
 
   function translatePage() {
@@ -414,17 +425,18 @@
       $('.section-intro',section).textContent = sectionCopy[section.id][state.lang];
     });
     products.forEach(product => {
-      if (!product.clickable) {
-        $('.product-title',product.card).textContent = displayName(product);
-      } else {
-        $('.product-title',product.card).textContent = displayName(product);
+      const name = displayName(product);
+      $('.product-title',product.card).textContent = name;
+      const tap = $('.product-tap',product.card);
+      if (tap) {
         $('.product-badge',product.card).textContent = product.category === 'specials' ? x.specialBadge : x.plateBadge;
         $('.card-more',product.card).firstChild.textContent = x.details + ' ';
-        const tap = $('.product-tap',product.card);
-        tap.setAttribute('aria-label',x.view(displayName(product)));
-        if (!product.image) $('.plate-visual-caption',product.card).textContent = x.plateCaption;
-        else $('.product-visual img',product.card).alt = displayName(product);
+        tap.setAttribute('aria-label',x.view(name));
+        const caption = $('.plate-visual .plate-visual-caption',tap);
+        if (caption) caption.textContent = x.plateCaption;
       }
+      const image = $('img',product.card);
+      if (image) image.alt = name;
       const currency=$('.price small',product.card);
       if(currency) currency.textContent = product.price !== '' ? x.currency : (state.lang==='ar' ? 'اسأل عن السعر' : 'Ask for price');
     });
@@ -559,11 +571,16 @@
     }, 190);
   });
   dialogClose.addEventListener('click', closeDetails);
+  dialog.addEventListener('cancel', event => {
+    event.preventDefault();
+    closeDetails();
+  });
   dialog.addEventListener('click', event => {
     // Clicking on dark backdrop (outside dialog-shell) closes the modal.
     if (event.target === dialog) closeDetails();
   });
   dialog.addEventListener('close', () => {
+    dialog.classList.remove('is-closing');
     document.body.classList.remove('dialog-open');
     state.activeProduct = null;
     // Restore keyboard focus to the original item unless it was hidden by a filter.
