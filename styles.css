@@ -1590,7 +1590,7 @@ html[dir="ltr"] .product-tap:focus-visible .details-arrow { transform: scaleX(-1
   }
 }
 
-@media (prefers-reduced-motion: no-preference) {
+@media (min-width: 651px) and (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
   #specials { --signature-entry-offset: 22px; }
   html[dir="rtl"] #specials { --signature-entry-offset: -22px; }
   #specials .product-card--detail { --signature-entry-direction: 1; }
@@ -1648,7 +1648,7 @@ html[dir="ltr"] .product-tap:focus-visible .details-arrow { transform: scaleX(-1
   }
 }
 @supports (animation-timeline: view()) {
-  @media (prefers-reduced-motion: no-preference) {
+  @media (min-width: 651px) and (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
     #specials .product-card--detail { overflow: clip; }
     #specials .product-tap:not(:focus-visible) {
       animation: featured-row-scroll auto linear both;
@@ -1656,6 +1656,26 @@ html[dir="ltr"] .product-tap:focus-visible .details-arrow { transform: scaleX(-1
       animation-range: entry 0% exit 100%;
     }
   }
+}
+@media (max-width: 650px), (hover: none), (pointer: coarse) {
+  .product-dialog.is-featured::backdrop {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .product-dialog.is-featured[open] {
+      animation: featured-touch-dialog-in .45s ease-out both;
+    }
+    .product-dialog.is-featured[open].is-closing {
+      animation: featured-touch-dialog-out .32s ease-in-out both;
+    }
+  }
+}
+@keyframes featured-touch-dialog-in {
+  from { opacity: 0; transform: translateY(28px); }
+}
+@keyframes featured-touch-dialog-out {
+  to { opacity: 0; transform: translateY(22px); }
 }
 @keyframes featured-row-scroll {
   entry 0%, exit 100% { opacity: 0; }
