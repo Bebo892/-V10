@@ -58,7 +58,7 @@
       hero: 'كل لحظة أحلى في كافيه حلويات مصر', intro: 'اكتشف مشروباتك المفضلة وأصناف الديسيرت من منيو الكافيه.',
       explore: 'استكشف المنيو', searchLabel: 'بتدور على صنف معين؟', searchPlaceholder: 'جرّب: كابتشينو، أم علي، بانانا سبليت...',
       searchButton: 'بحث', categories: 'أقسام المنيو', showAll: 'عرض جميع الأقسام',
-      currency: 'جنيه', price: 'السعر', ingredients: 'أبرز المكونات', close: 'إغلاق التفاصيل', details: 'عرض التفاصيل',
+      currency: 'جنيه', price: 'السعر', ingredients: 'أبرز المكونات', close: 'إغلاق التفاصيل', details: 'عرض التفاصيل', specialDetails: 'التفاصيل',
       specialBadge: 'صنف مميز', plateBadge: 'من أطباقنا', plateCaption: 'من أطباق الكافيه',
       photoPending: 'صورة الطبق هتتضاف قريبًا',
       footerNotice: 'هذا المنيو للعرض فقط، ولا توجد طلبات أو مدفوعات من خلال الموقع.',
@@ -73,14 +73,14 @@
       priceRanges: {all:'كل الأسعار', under50:'أقل من 50 جنيه', between:'50 – 100 جنيه', over100:'أكثر من 100 جنيه'},
       priceFilterAria: 'فلترة الأصناف حسب السعر', noMatchesReset: 'مسح الفلاتر',
       footerContactTitle: 'تواصل مع الكافيه', footerContactDesc: 'للاستفسارات أو معرفة تفاصيل الفروع:',
-      footerMap: 'عرض الموقع على Google Maps', footerCity: 'الإسكندرية، مصر', adminLink: 'Main Admin'
+      footerMap: 'عرض الموقع على Google Maps', footerCity: 'الإسكندرية، مصر', adminLink: 'دخول الإدارة'
     },
     en: {
       title: 'Café Menu | Halaweyat Masr', skip: 'Skip to menu', brand: 'Halaweyat Masr Café', menu: 'Categories',
       hero: 'Every moment is sweeter at Halaweyat Masr Café', intro: 'Explore drinks and desserts from our café menu.',
       explore: 'Explore the menu', searchLabel: 'Looking for something?', searchPlaceholder: 'Try: Cappuccino, Om Ali, Banana Split...',
       searchButton: 'Search', categories: 'Menu Categories', showAll: 'Show all categories',
-      currency: 'EGP', price: 'Price', ingredients: 'Key ingredients', close: 'Close details', details: 'View details',
+      currency: 'EGP', price: 'Price', ingredients: 'Key ingredients', close: 'Close details', details: 'View details', specialDetails: 'Details',
       specialBadge: 'Signature item', plateBadge: 'From our menu', plateCaption: 'From our café kitchen',
       photoPending: 'Photo coming soon',
       footerNotice: 'This menu is for viewing only. No orders or payments are accepted here.',
@@ -95,7 +95,7 @@
       priceRanges: {all:'All prices', under50:'Under EGP 50', between:'EGP 50 – 100', over100:'Over EGP 100'},
       priceFilterAria: 'Filter menu by price', noMatchesReset: 'Clear filters',
       footerContactTitle: 'Contact the café', footerContactDesc: 'Questions or branch information? Call us:',
-      footerMap: 'View on Google Maps', footerCity: 'Alexandria, Egypt', adminLink: 'Main Admin'
+      footerMap: 'View on Google Maps', footerCity: 'Alexandria, Egypt', adminLink: 'Admin sign-in'
     }
   };
   const state = { lang: 'ar', category: 'all', price: 'all', query: '', activeProduct: null };
@@ -112,6 +112,20 @@
     aliases: card.dataset.aliases || ''
   });
   let products = $$('.product-card').map(makeProduct);
+  const featuredObserver = 'IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    ? new IntersectionObserver(entries => {
+      entries.forEach(({ target, isIntersecting }) => {
+        if (!isIntersecting || !target.isConnected) return;
+        target.classList.add('featured-row-enter');
+        featuredObserver.unobserve(target);
+      });
+    }, { threshold: .2 }) : null;
+  function observeFeaturedRows() {
+    if (!featuredObserver) return;
+    featuredObserver.disconnect();
+    products.filter(product => product.category === 'specials' && !product.card.classList.contains('featured-row-enter'))
+      .forEach(product => featuredObserver.observe(product.card));
+  }
   const readablePrice = product => {
     const n = Number(product.price);
     return product.price !== '' && product.price != null && Number.isFinite(n) && n > 0
@@ -130,6 +144,7 @@
     state.activeProduct = products.find(p=>p.id===activeId && p.clickable) || null;
     if (!state.activeProduct && dialog.open) closeDetails();
     translatePage();
+    observeFeaturedRows();
     updateSticky();
   });
   document.addEventListener('menu:image-loaded', event => {
@@ -355,6 +370,7 @@
     });
     dialogVisual.replaceChildren();
     dialogVisual.classList.toggle('has-photo', Boolean(product.image));
+    dialogVisual.classList.toggle('has-cutout', Boolean(product.image) && product.card.classList.contains('has-cutout'));
     if (product.image) {
       const img = document.createElement('img');
       img.src = product.image;
@@ -430,7 +446,8 @@
       const tap = $('.product-tap',product.card);
       if (tap) {
         $('.product-badge',product.card).textContent = product.category === 'specials' ? x.specialBadge : x.plateBadge;
-        $('.card-more',product.card).firstChild.textContent = x.details + ' ';
+        const detailsLabel = product.category === 'specials' ? x.specialDetails : x.details;
+        $('.card-more',product.card).firstChild.textContent = detailsLabel + ' ';
         tap.setAttribute('aria-label',x.view(name));
         const caption = $('.plate-visual .plate-visual-caption',tap);
         if (caption) caption.textContent = x.plateCaption;
@@ -588,6 +605,7 @@
 
 
   translatePage();
+  observeFeaturedRows();
   syncActiveStickySection();
   const linkedItem = new URLSearchParams(location.search).get('item');
   if (linkedItem) {
