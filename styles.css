@@ -1389,3 +1389,142 @@ html[dir="ltr"] .product-tap:focus-visible .details-arrow { transform: scaleX(-1
     border-radius: 12px;
   }
 }
+
+/* Signature items use the photography as the card surface. */
+#specials .product-card--detail[data-image]:not([data-image=""]) {
+  overflow: hidden;
+  isolation: isolate;
+  border: 1px solid #533a60;
+  border-radius: 18px;
+  background: #291a32;
+  box-shadow: 0 8px 20px #291a3226;
+}
+#specials .product-card--detail[data-image]:not([data-image=""]) .product-tap {
+  position: relative;
+  display: grid;
+  grid-template-areas: "photo";
+  grid-template-columns: minmax(0, 1fr);
+  align-items: end;
+}
+#specials .photo-visual {
+  grid-area: photo;
+  display: block;
+  align-self: stretch;
+  height: auto;
+  min-height: 0;
+  aspect-ratio: 4 / 5;
+  background: #392249;
+}
+#specials .photo-visual img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  object-fit: cover;
+  border-radius: 0;
+  -webkit-mask-image: none;
+  mask-image: none;
+  transform: none;
+}
+#specials [data-image^="assets/products/banana-split.webp"] .photo-visual {
+  background: linear-gradient(180deg, #ad91b9 58%, #50365b 78%, #241429 100%);
+}
+#specials [data-image^="assets/products/banana-split.webp"] .photo-visual img {
+  object-fit: contain;
+  object-position: center top;
+}
+#specials .product-card--detail[data-image]:not([data-image=""]) .product-info {
+  grid-area: photo;
+  align-self: end;
+  position: relative;
+  z-index: 1;
+  padding: 37px 13px 12px;
+  background: linear-gradient(180deg, transparent, #231329ec 58%, #201126 100%);
+}
+#specials .product-card--detail[data-image]:not([data-image=""]) .product-badge {
+  display: none;
+}
+#specials .product-card--detail[data-image]:not([data-image=""]) .product-title {
+  color: #fffaff;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+#specials .product-card--detail[data-image]:not([data-image=""]) .product-footer {
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 9px;
+  margin-top: 7px;
+}
+#specials .product-card--detail[data-image]:not([data-image=""]) .price {
+  align-self: auto;
+  margin: 0;
+  color: #ffe2a4;
+  font-size: .93rem;
+}
+#specials .product-card--detail[data-image]:not([data-image=""]) .card-more {
+  width: auto;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  color: #f7ebfa;
+  background: transparent;
+  box-shadow: none;
+  font-size: .73rem;
+}
+#specials .product-card--detail[data-image]:not([data-image=""]) .details-arrow {
+  width: 14px;
+  height: 14px;
+}
+
+@media (max-width: 650px) {
+  .category-grid .category-card[data-filter="specials"] {
+    grid-column: 1 / -1;
+    min-height: 62px;
+    border-color: #dcc186;
+    background: linear-gradient(115deg, #fff7e5, #f3e4bd);
+  }
+  .category-grid .category-card[data-filter="specials"] strong { color: #614918; }
+  .category-grid .category-card[data-filter="specials"].is-active {
+    border-color: #ad8541;
+    background: linear-gradient(115deg, #fff1cf, #e9d39a);
+  }
+  #cold-drinks .products-grid--simple {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  #cold-drinks .product-card--simple {
+    min-height: 56px;
+    padding: 9px 10px;
+    gap: 5px;
+    flex-wrap: nowrap;
+  }
+  #cold-drinks .product-title {
+    font-size: .8rem;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+  }
+  #cold-drinks .price,
+  #cold-drinks .price small { font-size: .73rem; }
+  #cold-drinks .product-card--simple:has(.simple-thumb) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  #specials .product-card--detail[data-image]:not([data-image=""]) .product-info {
+    padding: 25px 9px 9px;
+  }
+  #specials .product-card--detail[data-image]:not([data-image=""]) .price,
+  #specials .product-card--detail[data-image]:not([data-image=""]) .card-more {
+    font-size: .72rem;
+  }
+}
+@media (max-width: 370px) {
+  #cold-drinks .product-card--simple {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  #cold-drinks .product-card--simple .price { align-self: flex-start; }
+}
