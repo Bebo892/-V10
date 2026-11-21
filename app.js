@@ -112,7 +112,8 @@
     aliases: card.dataset.aliases || ''
   });
   let products = $$('.product-card').map(makeProduct);
-  const featuredObserver = 'IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  const layeredFeaturedMotion = window.matchMedia('(min-width: 651px) and (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)');
+  const featuredObserver = 'IntersectionObserver' in window && layeredFeaturedMotion.matches
     ? new IntersectionObserver(entries => {
       entries.forEach(({ target, isIntersecting }) => {
         if (!isIntersecting || !target.isConnected) return;
@@ -280,11 +281,12 @@
     state.query = '';
     searchInput.value = '';
     closeSuggestions();
-    renderResults(recordHistory);
+    const animate = recordHistory && (filter !== 'specials' || layeredFeaturedMotion.matches);
+    renderResults(animate);
 
     const hash = `#${target.id}`;
     if (recordHistory && location.hash !== hash) history.pushState(null, '', hash);
-    if (scroll) target.scrollIntoView({ behavior: recordHistory ? scrollBehavior() : 'instant', block: 'start' });
+    if (scroll) target.scrollIntoView({ behavior: animate ? scrollBehavior() : 'instant', block: 'start' });
   }
   function restoreCategory() {
     const filter = categoryFromLocation();
@@ -421,7 +423,10 @@
       return;
     }
     dialog.classList.add('is-closing');
-    const animation = dialogVisual.getAnimations?.().find(item => item.animationName === 'featured-photo-out');
+    const desktopMotion = layeredFeaturedMotion.matches;
+    const exitTarget = desktopMotion ? dialogVisual : dialog;
+    const exitName = desktopMotion ? 'featured-photo-out' : 'featured-touch-dialog-out';
+    const animation = exitTarget.getAnimations?.().find(item => item.animationName === exitName);
     if (animation) {
       const finish = () => { if (dialog.open && dialog.classList.contains('is-closing')) dialog.close(); };
       animation.finished.then(finish, finish);
