@@ -6,7 +6,7 @@ import {firebaseConfig, firebaseReady} from './firebase-config.js';
 
 const categories = ['hot-drinks','cold-drinks','dessert-cups','mixed-plates','specials'];
 const detailCats = new Set(['mixed-plates','specials']);
-const featuredCardPhotos = new Set([
+const featuredCutouts = new Set([
   'assets/products/lejua.webp',
   'assets/products/coco-choc.webp',
   'assets/products/dessert-dousser.webp',
@@ -15,6 +15,7 @@ const featuredCardPhotos = new Set([
   'assets/products/peche-melba.webp',
   'assets/products/choco-pistache.webp'
 ]);
+const cutoutVersion = 'featured-cutouts-1';
 const imageCache = new Map();
 const imageVersions = new Map();
 const imageRequests = new Map();
@@ -29,10 +30,12 @@ const validProduct=p=>p && typeof p==='object' && typeof p.id==='string' && /^[\
 
 function makeCard(p){
   const featured = p.category === 'specials';
-  const hasFeaturedPhoto = featured && p.imageSource==='asset' && featuredCardPhotos.has(p.image);
+  const cutoutFile = featured && p.imageSource==='asset' && featuredCutouts.has(p.image)
+    ? p.image.split('/').pop() : '';
   const detail = featured || (p.category === 'mixed-plates' && ((p.imageSource === 'asset' && !!p.image) || (p.imageSource === 'firestore' && !!p.hasImage)));
   const article=document.createElement('article');
   addClass(article,`product-card product-card--${detail?'detail':'simple'}`);
+  if(cutoutFile)article.classList.add('has-cutout');
   const price=typeof p.price==='number' && Number.isFinite(p.price) && p.price>0?p.price:null;
   Object.assign(article.dataset,{
     productId:p.id,category:p.category,name:p.ar,nameEn:p.en||p.ar,
@@ -40,7 +43,9 @@ function makeCard(p){
     descriptionAr:p.descriptionAr||'',descriptionEn:p.descriptionEn||'',
     ingredientsAr:(Array.isArray(p.ingredientsAr)?p.ingredientsAr:[]).join('|'),
     ingredientsEn:(Array.isArray(p.ingredientsEn)?p.ingredientsEn:[]).join('|'),
-    image:p.imageSource==='asset' && p.image?versionedAsset(p.image,hasFeaturedPhoto?'featured-gold-1':undefined):''
+    image:p.imageSource==='asset' && p.image
+      ? (cutoutFile ? versionedAsset(`assets/products/cutouts/${cutoutFile}`,cutoutVersion) : versionedAsset(p.image))
+      : ''
   });
   if(p.imageSource==='firestore' && p.hasImage) article.dataset.cloudImage=p.id;
   const priceSpan=txt('span', price===null?'':price,'price');
@@ -67,8 +72,8 @@ function makeCard(p){
       img.alt=p.ar;
       img.loading=featured?'eager':'lazy';
       img.decoding='async';
-      img.src=hasFeaturedPhoto
-        ? versionedAsset(p.image.replace('assets/products/','assets/products/cards/'),'featured-gold-1')
+      img.src=cutoutFile
+        ? versionedAsset(`assets/products/cutouts/cards/${cutoutFile}`,cutoutVersion)
         : article.dataset.image;
       visual.append(img);
     }else visual.append(txt('span','جاري تحميل الصورة…','plate-visual-caption'));
@@ -79,7 +84,7 @@ function makeCard(p){
   const info=document.createElement('span');addClass(info,'product-info');
   info.append(txt('span',p.category==='specials'?'صنف مميز':'من أطباقنا','product-badge'),txt('span',p.ar,'product-title'));
   const foot=document.createElement('span');addClass(foot,'product-footer');
-  const more=txt('span','عرض التفاصيل ','card-more');more.insertAdjacentHTML('beforeend',svgArrow);
+  const more=txt('span',featured?'التفاصيل ':'عرض التفاصيل ','card-more');more.insertAdjacentHTML('beforeend',svgArrow);
   foot.append(priceSpan,more);info.append(foot);button.append(visual,info);article.append(button);
   return article;
 }
