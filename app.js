@@ -212,10 +212,9 @@
     return true;
   }
 
-  function resetAll() {
-    state.category = 'all'; state.price = 'all'; state.query = '';
-    searchInput.value = '';
-    closeSuggestions(); renderResults(true);
+  function resetAll(scroll = false) {
+    state.price = 'all';
+    setCategory('all', { scroll });
   }
 
   function revealResults() {
@@ -272,11 +271,26 @@
     searchInput.setAttribute('aria-expanded','true');
   }
   const scrollBehavior=() => window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
-  function setCategory(filter) {
-    state.category = state.category === filter ? 'all' : filter;
-    state.query = ''; searchInput.value=''; closeSuggestions(); renderResults(true);
-    (state.category==='all' ? categoriesSection : document.getElementById(state.category))
-      ?.scrollIntoView({behavior:scrollBehavior(),block:'start'});
+  const categoryFromLocation = () => menuSections.find(section => location.hash === `#${section.id}`)?.id || 'all';
+  function setCategory(filter, { recordHistory = true, scroll = true } = {}) {
+    const target = filter === 'all' ? categoriesSection : menuSections.find(section => section.id === filter);
+    if (!target) return;
+
+    state.category = filter;
+    state.query = '';
+    searchInput.value = '';
+    closeSuggestions();
+    renderResults(recordHistory);
+
+    const hash = `#${target.id}`;
+    if (recordHistory && location.hash !== hash) history.pushState(null, '', hash);
+    if (scroll) target.scrollIntoView({ behavior: recordHistory ? scrollBehavior() : 'instant', block: 'start' });
+  }
+  function restoreCategory() {
+    const filter = categoryFromLocation();
+    if (state.category !== filter) {
+      setCategory(filter, { recordHistory: false, scroll: filter !== 'all' });
+    }
   }
   let lastStickyCategory;
   function updateSticky() {
@@ -510,10 +524,9 @@
     const link=event.target.closest('.sticky-category-link');
     if(link) setCategory(link.dataset.filter);
   });
-  resetFilter.addEventListener('click',()=>{
-    resetAll();
-    categoriesSection.scrollIntoView({behavior:scrollBehavior(),block:'start'});
-  });
+  resetFilter.addEventListener('click',()=>resetAll(true));
+  window.addEventListener('popstate', restoreCategory);
+  window.addEventListener('hashchange', restoreCategory);
   priceFilter.addEventListener('click', event => {
     const button = event.target.closest('[data-price-range]');
     if (!button) return;
@@ -604,6 +617,7 @@
   });
 
 
+  state.category = categoryFromLocation();
   translatePage();
   observeFeaturedRows();
   syncActiveStickySection();
