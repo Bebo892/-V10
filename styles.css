@@ -1493,23 +1493,23 @@ html[dir="ltr"] .product-tap:focus-visible .details-arrow { transform: scaleX(-1
     border-color: #ad8541;
     background: linear-gradient(115deg, #fff1cf, #e9d39a);
   }
-  #cold-drinks .products-grid--simple {
+  :is(#hot-drinks, #cold-drinks) .products-grid--simple {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-  #cold-drinks .product-card--simple {
+  :is(#hot-drinks, #cold-drinks) .product-card--simple {
     min-height: 56px;
     padding: 9px 10px;
     gap: 5px;
     flex-wrap: nowrap;
   }
-  #cold-drinks .product-title {
+  :is(#hot-drinks, #cold-drinks) .product-title {
     font-size: .8rem;
     line-height: 1.4;
     overflow-wrap: anywhere;
   }
-  #cold-drinks .price,
-  #cold-drinks .price small { font-size: .73rem; }
-  #cold-drinks .product-card--simple:has(.simple-thumb) {
+  :is(#hot-drinks, #cold-drinks) .price,
+  :is(#hot-drinks, #cold-drinks) .price small { font-size: .73rem; }
+  :is(#hot-drinks, #cold-drinks) .product-card--simple:has(.simple-thumb) {
     flex-direction: column;
     align-items: stretch;
   }
@@ -1522,9 +1522,9 @@ html[dir="ltr"] .product-tap:focus-visible .details-arrow { transform: scaleX(-1
   }
 }
 @media (max-width: 370px) {
-  #cold-drinks .product-card--simple {
+  :is(#hot-drinks, #cold-drinks) .product-card--simple {
     flex-direction: column;
     align-items: flex-start;
   }
-  #cold-drinks .product-card--simple .price { align-self: flex-start; }
+  :is(#hot-drinks, #cold-drinks) .product-card--simple .price { align-self: flex-start; }
 }
