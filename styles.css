@@ -1528,3 +1528,76 @@ html[dir="ltr"] .product-tap:focus-visible .details-arrow { transform: scaleX(-1
   }
   :is(#hot-drinks, #cold-drinks) .product-card--simple .price { align-self: flex-start; }
 }
+
+/* Carry the featured cards' palette into their details dialog. */
+.product-dialog.is-featured {
+  border-color: #5b4268;
+  background: #291a32;
+  color: #fffaff;
+}
+.is-featured .dialog-product-image {
+  background: #362242;
+}
+.is-featured .dialog-product-image.has-photo {
+  padding: 0;
+  background: #362242;
+}
+.is-featured .dialog-product-image.has-photo::after {
+  content: none;
+}
+.is-featured .dialog-product-image.has-photo img {
+  max-height: none;
+  object-position: center top;
+}
+.is-featured .dialog-copy h2 { color: #fffaff; }
+.is-featured .dialog-category,
+.is-featured .dialog-ingredient-chip {
+  color: #f3e7f7;
+  border-color: #765c80;
+  background: #472f52;
+}
+.is-featured .dialog-description,
+.is-featured .dialog-ingredients-label,
+.is-featured .dialog-price-label,
+.is-featured .dialog-placeholder-caption { color: #e8d9ed; }
+.is-featured .dialog-price-row { border-color: #705779; }
+.is-featured .dialog-price { color: #ffe2a4; }
+.is-featured .dialog-close {
+  color: #fffaff;
+  border-color: #ffffff59;
+  background: #211329dd;
+}
+.is-featured .dialog-close:hover { background: #412b4d; }
+.is-featured .dialog-close:focus-visible { outline: 2px solid #ffe2a4; outline-offset: 2px; }
+
+@media (max-width: 650px) {
+  .is-featured .dialog-product-image.has-photo {
+    display: block;
+    height: auto;
+  }
+  .is-featured .dialog-product-image.has-photo img {
+    width: 100%;
+    height: auto;
+    max-height: 61dvh;
+    object-fit: contain;
+  }
+  .is-featured .dialog-product-image.has-photo::after {
+    content: '';
+    z-index: 2;
+    inset: auto 0 0;
+    height: 32px;
+    border: 0;
+    border-radius: 0;
+    background: linear-gradient(transparent, #291a32);
+  }
+  .is-featured .dialog-copy {
+    padding: 14px 20px calc(20px + env(safe-area-inset-bottom));
+  }
+  .is-featured .dialog-close {
+    inset-block-start: 14px;
+    inset-inline-end: 13px;
+    width: 44px;
+    height: 44px;
+  }
+  .is-featured .sheet-grabber { background: #f1e0faac; }
+}

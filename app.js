@@ -333,6 +333,7 @@
   function updateDialog() {
     const product = state.activeProduct;
     if (!product || !product.clickable) return;
+    dialog.classList.toggle('is-featured', product.category === 'specials');
     dialogCategory.textContent = categoryName(product.category);
     dialogTitle.textContent = displayName(product);
     dialogDescription.textContent = displayDescription(product);
