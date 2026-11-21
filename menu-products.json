@@ -351,13 +351,13 @@
     "descriptionEn": "",
     "ingredientsAr": [],
     "ingredientsEn": [],
-    "image": "assets/products/milkshake.webp",
-    "imageSource": "asset",
+    "image": "",
+    "imageSource": "none",
     "active": true,
     "order": 19,
     "code": "1961",
     "origin": "price-sheet-2026-11",
-    "hasImage": true
+    "hasImage": false
   },
   {
     "id": "cold-drinks-1905",
