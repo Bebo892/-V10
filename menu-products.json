@@ -1107,13 +1107,13 @@
     "descriptionEn": "",
     "ingredientsAr": [],
     "ingredientsEn": [],
-    "image": "",
-    "imageSource": "none",
+    "image": "assets/products/cutouts/mango-with-cream.webp",
+    "imageSource": "asset",
     "active": true,
     "order": 61,
     "code": "1925",
     "origin": "price-sheet-2026-11",
-    "hasImage": false
+    "hasImage": true
   },
   {
     "id": "dessert-cups-1983",
@@ -1125,13 +1125,13 @@
     "descriptionEn": "",
     "ingredientsAr": [],
     "ingredientsEn": [],
-    "image": "",
-    "imageSource": "none",
+    "image": "assets/products/cutouts/strawberry-with-cream.webp",
+    "imageSource": "asset",
     "active": true,
     "order": 62,
     "code": "1983",
     "origin": "price-sheet-2026-11",
-    "hasImage": false
+    "hasImage": true
   },
   {
     "id": "dessert-cups-1916",
@@ -1143,13 +1143,13 @@
     "descriptionEn": "",
     "ingredientsAr": [],
     "ingredientsEn": [],
-    "image": "",
-    "imageSource": "none",
+    "image": "assets/products/cutouts/banana-with-cream.webp",
+    "imageSource": "asset",
     "active": true,
     "order": 63,
     "code": "1916",
     "origin": "price-sheet-2026-11",
-    "hasImage": false
+    "hasImage": true
   },
   {
     "id": "dessert-cups-1915",
@@ -1161,13 +1161,13 @@
     "descriptionEn": "",
     "ingredientsAr": [],
     "ingredientsEn": [],
-    "image": "",
-    "imageSource": "none",
+    "image": "assets/products/cutouts/apple-with-cream.webp",
+    "imageSource": "asset",
     "active": true,
     "order": 64,
     "code": "1915",
     "origin": "price-sheet-2026-11",
-    "hasImage": false
+    "hasImage": true
   },
   {
     "id": "dessert-cups-1917",
@@ -1179,13 +1179,13 @@
     "descriptionEn": "",
     "ingredientsAr": [],
     "ingredientsEn": [],
-    "image": "",
-    "imageSource": "none",
+    "image": "assets/products/cutouts/peach-with-cream.webp",
+    "imageSource": "asset",
     "active": true,
     "order": 65,
     "code": "1917",
     "origin": "price-sheet-2026-11",
-    "hasImage": false
+    "hasImage": true
   },
   {
     "id": "dessert-cups-1918",
@@ -1233,13 +1233,13 @@
     "descriptionEn": "",
     "ingredientsAr": [],
     "ingredientsEn": [],
-    "image": "",
-    "imageSource": "none",
+    "image": "assets/products/cutouts/apricot-jelly.webp",
+    "imageSource": "asset",
     "active": true,
     "order": 68,
     "code": "1920",
     "origin": "price-sheet-2026-11",
-    "hasImage": false
+    "hasImage": true
   },
   {
     "id": "dessert-cups-1921",
@@ -1269,13 +1269,13 @@
     "descriptionEn": "",
     "ingredientsAr": [],
     "ingredientsEn": [],
-    "image": "",
-    "imageSource": "none",
+    "image": "assets/products/cutouts/plain-custard.webp",
+    "imageSource": "asset",
     "active": true,
     "order": 70,
     "code": "1933",
     "origin": "price-sheet-2026-11",
-    "hasImage": false
+    "hasImage": true
   },
   {
     "id": "dessert-cups-1913",
@@ -1323,13 +1323,13 @@
     "descriptionEn": "",
     "ingredientsAr": [],
     "ingredientsEn": [],
-    "image": "",
-    "imageSource": "none",
+    "image": "assets/products/cutouts/fruit-custard.webp",
+    "imageSource": "asset",
     "active": true,
     "order": 73,
     "code": "1924",
     "origin": "price-sheet-2026-11",
-    "hasImage": false
+    "hasImage": true
   },
   {
     "id": "dessert-cups-1932",
@@ -1341,13 +1341,13 @@
     "descriptionEn": "",
     "ingredientsAr": [],
     "ingredientsEn": [],
-    "image": "",
-    "imageSource": "none",
+    "image": "assets/products/cutouts/plain-ashoura.webp",
+    "imageSource": "asset",
     "active": true,
     "order": 74,
     "code": "1932",
     "origin": "price-sheet-2026-11",
-    "hasImage": false
+    "hasImage": true
   },
   {
     "id": "dessert-cups-1912",
@@ -1467,13 +1467,13 @@
     "descriptionEn": "",
     "ingredientsAr": [],
     "ingredientsEn": [],
-    "image": "",
-    "imageSource": "none",
+    "image": "assets/products/cutouts/original-gateau.webp",
+    "imageSource": "asset",
     "active": true,
     "order": 81,
     "code": "2016",
     "origin": "price-sheet-2026-11",
-    "hasImage": false
+    "hasImage": true
   },
   {
     "id": "mixed-plates-1952",
@@ -1485,13 +1485,13 @@
     "descriptionEn": "",
     "ingredientsAr": [],
     "ingredientsEn": [],
-    "image": "",
-    "imageSource": "none",
+    "image": "assets/products/cutouts/plain-croissant.webp",
+    "imageSource": "asset",
     "active": true,
     "order": 82,
     "code": "1952",
     "origin": "price-sheet-2026-11",
-    "hasImage": false
+    "hasImage": true
   },
   {
     "id": "mixed-plates-1974",
@@ -1521,13 +1521,13 @@
     "descriptionEn": "",
     "ingredientsAr": [],
     "ingredientsEn": [],
-    "image": "",
-    "imageSource": "none",
+    "image": "assets/products/cutouts/cheese-pastry.webp",
+    "imageSource": "asset",
     "active": true,
     "order": 84,
     "code": "1953",
     "origin": "price-sheet-2026-11",
-    "hasImage": false
+    "hasImage": true
   },
   {
     "id": "mixed-plates-2537",
@@ -1539,13 +1539,13 @@
     "descriptionEn": "",
     "ingredientsAr": [],
     "ingredientsEn": [],
-    "image": "",
-    "imageSource": "none",
+    "image": "assets/products/cutouts/sausage-pastry.webp",
+    "imageSource": "asset",
     "active": true,
     "order": 85,
     "code": "2537",
     "origin": "price-sheet-2026-11",
-    "hasImage": false
+    "hasImage": true
   },
   {
     "id": "mixed-plates-1954",
@@ -1557,13 +1557,13 @@
     "descriptionEn": "",
     "ingredientsAr": [],
     "ingredientsEn": [],
-    "image": "",
-    "imageSource": "none",
+    "image": "assets/products/cutouts/chocolate-pastry.webp",
+    "imageSource": "asset",
     "active": true,
     "order": 86,
     "code": "1954",
     "origin": "price-sheet-2026-11",
-    "hasImage": false
+    "hasImage": true
   },
   {
     "id": "mixed-plates-1957",
@@ -1575,13 +1575,13 @@
     "descriptionEn": "",
     "ingredientsAr": [],
     "ingredientsEn": [],
-    "image": "",
-    "imageSource": "none",
+    "image": "assets/products/cutouts/fruit-danish.webp",
+    "imageSource": "asset",
     "active": true,
     "order": 87,
     "code": "1957",
     "origin": "price-sheet-2026-11",
-    "hasImage": false
+    "hasImage": true
   },
   {
     "id": "mixed-plates-1910",
@@ -1611,13 +1611,13 @@
     "descriptionEn": "",
     "ingredientsAr": [],
     "ingredientsEn": [],
-    "image": "",
-    "imageSource": "none",
+    "image": "assets/products/cutouts/om-ali.webp",
+    "imageSource": "asset",
     "active": true,
     "order": 89,
     "code": "1934",
     "origin": "price-sheet-2026-11",
-    "hasImage": false
+    "hasImage": true
   },
   {
     "id": "mixed-plates-1947",
@@ -1629,13 +1629,13 @@
     "descriptionEn": "",
     "ingredientsAr": [],
     "ingredientsEn": [],
-    "image": "",
-    "imageSource": "none",
+    "image": "assets/products/cutouts/kunafa-with-milk.webp",
+    "imageSource": "asset",
     "active": true,
     "order": 90,
     "code": "1947",
     "origin": "price-sheet-2026-11",
-    "hasImage": false
+    "hasImage": true
   },
   {
     "id": "mixed-plates-1946",
@@ -1647,13 +1647,13 @@
     "descriptionEn": "",
     "ingredientsAr": [],
     "ingredientsEn": [],
-    "image": "",
-    "imageSource": "none",
+    "image": "assets/products/cutouts/wheat-pudding-with-nuts.webp",
+    "imageSource": "asset",
     "active": true,
     "order": 91,
     "code": "1946",
     "origin": "price-sheet-2026-11",
-    "hasImage": false
+    "hasImage": true
   },
   {
     "id": "mixed-plates-1919",
@@ -1737,13 +1737,13 @@
     "descriptionEn": "",
     "ingredientsAr": [],
     "ingredientsEn": [],
-    "image": "",
-    "imageSource": "none",
+    "image": "assets/products/cutouts/molten-cake.webp",
+    "imageSource": "asset",
     "active": true,
     "order": 96,
     "code": "2003",
     "origin": "price-sheet-2026-11",
-    "hasImage": false
+    "hasImage": true
   },
   {
     "id": "mixed-plates-1984",
@@ -1773,13 +1773,13 @@
     "descriptionEn": "",
     "ingredientsAr": [],
     "ingredientsEn": [],
-    "image": "",
-    "imageSource": "none",
+    "image": "assets/products/cutouts/cheesecake.webp",
+    "imageSource": "asset",
     "active": true,
     "order": 98,
     "code": "201500",
     "origin": "price-sheet-2026-11",
-    "hasImage": false
+    "hasImage": true
   },
   {
     "id": "mixed-plates-1914",
@@ -1791,13 +1791,13 @@
     "descriptionEn": "",
     "ingredientsAr": [],
     "ingredientsEn": [],
-    "image": "",
-    "imageSource": "none",
+    "image": "assets/products/cutouts/qamar-al-din.webp",
+    "imageSource": "asset",
     "active": true,
     "order": 99,
     "code": "1914",
     "origin": "price-sheet-2026-11",
-    "hasImage": false
+    "hasImage": true
   },
   {
     "id": "mixed-plates-1922",
@@ -1809,13 +1809,13 @@
     "descriptionEn": "",
     "ingredientsAr": [],
     "ingredientsEn": [],
-    "image": "",
-    "imageSource": "none",
+    "image": "assets/products/cutouts/fruit-salad.webp",
+    "imageSource": "asset",
     "active": true,
     "order": 100,
     "code": "1922",
     "origin": "price-sheet-2026-11",
-    "hasImage": false
+    "hasImage": true
   },
   {
     "id": "mixed-plates-7920",
@@ -1827,13 +1827,13 @@
     "descriptionEn": "",
     "ingredientsAr": [],
     "ingredientsEn": [],
-    "image": "",
-    "imageSource": "none",
+    "image": "assets/products/cutouts/chocolate-mousse.webp",
+    "imageSource": "asset",
     "active": true,
     "order": 101,
     "code": "7920",
     "origin": "price-sheet-2026-11",
-    "hasImage": false
+    "hasImage": true
   },
   {
     "id": "mixed-plates-2017",
@@ -1845,13 +1845,13 @@
     "descriptionEn": "",
     "ingredientsAr": [],
     "ingredientsEn": [],
-    "image": "",
-    "imageSource": "none",
+    "image": "assets/products/cutouts/mousse-cup.webp",
+    "imageSource": "asset",
     "active": true,
     "order": 102,
     "code": "2017",
     "origin": "price-sheet-2026-11",
-    "hasImage": false
+    "hasImage": true
   },
   {
     "id": "mixed-plates-06740686",
@@ -1863,13 +1863,13 @@
     "descriptionEn": "",
     "ingredientsAr": [],
     "ingredientsEn": [],
-    "image": "",
-    "imageSource": "none",
+    "image": "assets/products/cutouts/mousse-cake.webp",
+    "imageSource": "asset",
     "active": true,
     "order": 103,
     "code": "06740686",
     "origin": "price-sheet-2026-11",
-    "hasImage": false
+    "hasImage": true
   },
   {
     "id": "mixed-plates-11130",
@@ -1881,13 +1881,13 @@
     "descriptionEn": "",
     "ingredientsAr": [],
     "ingredientsEn": [],
-    "image": "",
-    "imageSource": "none",
+    "image": "assets/products/cutouts/apple-pie.webp",
+    "imageSource": "asset",
     "active": true,
     "order": 104,
     "code": "11130",
     "origin": "price-sheet-2026-11",
-    "hasImage": false
+    "hasImage": true
   },
   {
     "id": "mixed-plates-1928",
@@ -1935,13 +1935,13 @@
     "descriptionEn": "",
     "ingredientsAr": [],
     "ingredientsEn": [],
-    "image": "",
-    "imageSource": "none",
+    "image": "assets/products/cutouts/despacito.webp",
+    "imageSource": "asset",
     "active": true,
     "order": 107,
     "code": "06740635",
     "origin": "price-sheet-2026-11",
-    "hasImage": false
+    "hasImage": true
   },
   {
     "id": "mixed-plates-2230",
@@ -1953,13 +1953,13 @@
     "descriptionEn": "",
     "ingredientsAr": [],
     "ingredientsEn": [],
-    "image": "",
-    "imageSource": "none",
+    "image": "assets/products/cutouts/despacito.webp",
+    "imageSource": "asset",
     "active": true,
     "order": 108,
     "code": "2230",
     "origin": "price-sheet-2026-11",
-    "hasImage": false
+    "hasImage": true
   },
   {
     "id": "mixed-plates-2231",
@@ -1971,13 +1971,13 @@
     "descriptionEn": "",
     "ingredientsAr": [],
     "ingredientsEn": [],
-    "image": "",
-    "imageSource": "none",
+    "image": "assets/products/cutouts/despacito.webp",
+    "imageSource": "asset",
     "active": true,
     "order": 109,
     "code": "2231",
     "origin": "price-sheet-2026-11",
-    "hasImage": false
+    "hasImage": true
   },
   {
     "id": "mixed-plates-06740700",
@@ -1989,13 +1989,13 @@
     "descriptionEn": "",
     "ingredientsAr": [],
     "ingredientsEn": [],
-    "image": "",
-    "imageSource": "none",
+    "image": "assets/products/cutouts/pistachio-donut.webp",
+    "imageSource": "asset",
     "active": true,
     "order": 110,
     "code": "06740700",
     "origin": "price-sheet-2026-11",
-    "hasImage": false
+    "hasImage": true
   },
   {
     "id": "mixed-plates-06740802",
@@ -2068,6 +2068,23 @@
     "code": "06741728",
     "origin": "price-sheet-2026-11",
     "hasImage": false
+  },
+  {
+    "id": "mixed-plates-mango-tres-leches",
+    "category": "mixed-plates",
+    "ar": "تريليتشا مانجو",
+    "en": "Mango Tres Leches Cake",
+    "price": 100,
+    "descriptionAr": "",
+    "descriptionEn": "",
+    "ingredientsAr": [],
+    "ingredientsEn": [],
+    "image": "assets/products/cutouts/mango-tres-leches.webp",
+    "imageSource": "asset",
+    "active": true,
+    "order": 114.5,
+    "origin": "user-confirmed",
+    "hasImage": true
   },
   {
     "id": "mixed-plates-2209",
@@ -2151,12 +2168,12 @@
     "descriptionEn": "",
     "ingredientsAr": [],
     "ingredientsEn": [],
-    "image": "",
-    "imageSource": "none",
+    "image": "assets/products/cutouts/dessert-jar-mango.webp",
+    "imageSource": "asset",
     "active": true,
     "order": 119,
     "code": "2384",
     "origin": "price-sheet-2026-11",
-    "hasImage": false
+    "hasImage": true
   }
 ]

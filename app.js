@@ -108,30 +108,30 @@
     descriptionEn: card.dataset.descriptionEn || '', image: card.dataset.image || '',
     ingredientsAr: (card.dataset.ingredientsAr || '').split('|').filter(Boolean),
     ingredientsEn: (card.dataset.ingredientsEn || '').split('|').filter(Boolean),
-    clickable: ['mixed-plates','specials'].includes(card.dataset.category),
+    clickable: !card.hasAttribute('data-menu-photo') && ['mixed-plates','specials'].includes(card.dataset.category),
     aliases: card.dataset.aliases || ''
   });
   let products = $$('.product-card').map(makeProduct);
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const layeredFeaturedMotion = window.matchMedia('(min-width: 651px) and (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)');
-  const featuredObserver = 'IntersectionObserver' in window && !prefersReducedMotion.matches
+  let lastRevealScroll = window.scrollY;
+  let enteringFromTop = false;
+  const productObserver = 'IntersectionObserver' in window
     ? new IntersectionObserver(entries => {
       entries.forEach(({ target, isIntersecting }) => {
-        if (!isIntersecting || !target.isConnected) return;
-        featuredObserver.unobserve(target);
-        target.classList.add('featured-row-enter');
-        if (!layeredFeaturedMotion.matches && !prefersReducedMotion.matches) {
-          target.classList.add('featured-touch-enter');
-          // Clear the trigger even if the row is filtered out mid-animation.
-          window.setTimeout(() => target.classList.remove('featured-touch-enter'), 980);
+        if (!target.isConnected) return;
+        if (!isIntersecting) {
+          target.classList.remove('menu-row-enter', 'menu-row-enter--from-top');
+        } else if (!target.classList.contains('menu-row-enter')) {
+          target.classList.toggle('menu-row-enter--from-top', enteringFromTop);
+          target.classList.add('menu-row-enter');
         }
       });
-    }, { threshold: .2 }) : null;
-  function observeFeaturedRows() {
-    if (!featuredObserver) return;
-    featuredObserver.disconnect();
-    products.filter(product => product.category === 'specials' && !product.card.classList.contains('featured-row-enter'))
-      .forEach(product => featuredObserver.observe(product.card));
+    }) : null;
+  function observeProductRows() {
+    if (!productObserver) return;
+    productObserver.disconnect();
+    products.forEach(({ card }) => productObserver.observe(card));
   }
   const readablePrice = product => {
     const n = Number(product.price);
@@ -151,7 +151,7 @@
     state.activeProduct = products.find(p=>p.id===activeId && p.clickable) || null;
     if (!state.activeProduct && dialog.open) closeDetails();
     translatePage();
-    observeFeaturedRows();
+    observeProductRows();
     updateSticky();
   });
   document.addEventListener('menu:image-loaded', event => {
@@ -469,7 +469,7 @@
       const name = displayName(product);
       $('.product-title',product.card).textContent = name;
       const tap = $('.product-tap',product.card);
-      if (tap) {
+      if (tap && product.clickable) {
         $('.product-badge',product.card).textContent = product.category === 'specials' ? x.specialBadge : x.plateBadge;
         const detailsLabel = product.category === 'specials' ? x.specialDetails : x.details;
         $('.card-more',product.card).firstChild.textContent = detailsLabel + ' ';
@@ -563,9 +563,16 @@
     });
   }
   window.addEventListener('scroll', () => {
-    if (!scrollTick) {scrollTick = true; requestAnimationFrame(syncActiveStickySection);}
+    const scroll = Math.max(0, window.scrollY);
+    if (scroll !== lastRevealScroll) enteringFromTop = scroll < lastRevealScroll;
+    lastRevealScroll = scroll;
+    if (scrollTick) return;
+    scrollTick = true;
+    requestAnimationFrame(() => {
+      syncActiveStickySection();
+      updateSticky();
+    });
   }, {passive: true});
-  window.addEventListener('scroll',updateSticky,{passive:true});
   window.addEventListener('resize',updateSticky,{passive:true});
 
   // Shimmer placeholders until each specialty image is ready.
@@ -629,7 +636,7 @@
 
   state.category = categoryFromLocation();
   translatePage();
-  observeFeaturedRows();
+  observeProductRows();
   syncActiveStickySection();
   const linkedItem = new URLSearchParams(location.search).get('item');
   if (linkedItem) {
