@@ -926,11 +926,6 @@ body.dialog-open .sticky-categories { display: none; }
 
 /* Image shimmer while lazy images decode; no blocking load for text-only rows */
 .photo-visual { position: relative; }
-.photo-visual.is-loading { background: #EBE4EF; }
-.photo-visual.is-loading::after { content: ''; position: absolute; inset: 0; background: linear-gradient(105deg,transparent 20%,rgba(255,255,255,.62) 47%,transparent 74%); animation: photo-shimmer 1.4s ease-in-out infinite; pointer-events: none; }
-@keyframes photo-shimmer { 0% { transform: translateX(-110%); } 100% { transform: translateX(110%); } }
-.photo-visual img { transition: opacity .28s ease; }
-.photo-visual.is-loading img { opacity: .25; }
 
 /* Footer — no invented address/social/hours, real logo */
 .site-footer { margin-top: 0; padding: 0; border-top: 3px solid #A17EB9; background: linear-gradient(130deg,#25182E,#402D4E); }
@@ -994,7 +989,6 @@ body.dialog-open .sticky-categories { display: none; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .sticky-categories, .photo-visual img { transition: none !important; }
-  .photo-visual.is-loading::after { animation: none; }
 }
 
 
@@ -1160,7 +1154,6 @@ body { background: var(--cream); color: var(--text); }
 .product-card--detail { background: #FFFDFF; border-color: #DED0E8; }
 .product-card--detail:focus-within { outline-color: #9671AF; }
 .product-visual { background: #F4EDF8; }
-.photo-visual.is-loading { background: #E6DCED; }
 .plate-visual {
   background: radial-gradient(circle at 55% 45%,rgba(255,255,255,.75),transparent 44%),
     linear-gradient(140deg,#F1E6F6,#DED0E8);
@@ -1816,20 +1809,13 @@ html[dir="ltr"] .product-tap:focus-visible .details-arrow { transform: scaleX(-1
 #mixed-plates .photo-visual--pair img:last-child { inset-inline: auto 0; }
 
 @media (prefers-reduced-motion: no-preference) {
-  .menu-row-enter {
-    --menu-entry-offset: 10px;
-    animation: menu-row-in .32s cubic-bezier(.22,.66,.32,1) backwards;
-  }
+  .menu-row-enter { --menu-entry-offset: 10px; }
   .menu-row-enter.menu-row-enter--from-top { --menu-entry-offset: -10px; }
-  .menu-row-enter:has(.simple-thumb) { animation-duration: .72s; }
-  .menu-row-enter:has(.photo-visual) { animation: none; }
-  .menu-row-enter .photo-visual,
-  .menu-row-enter:has(.photo-visual) .product-info {
+  .menu-row-enter :is(.photo-visual, .simple-thumb) {
     animation: menu-row-in .72s cubic-bezier(.22,.66,.32,1) backwards;
   }
-  .menu-row-enter:has(.photo-visual) .product-info { animation-delay: .11s; }
 }
 @keyframes menu-row-in {
-  from { opacity: .3; translate: 0 var(--menu-entry-offset); }
-  to { opacity: 1; translate: 0 0; }
+  from { opacity: .55; transform: translate3d(0,var(--menu-entry-offset),0); }
+  to { opacity: 1; transform: translate3d(0,0,0); }
 }

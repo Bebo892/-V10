@@ -85,7 +85,7 @@ function makeCard(p){
     if(!cloud){
       const img=document.createElement('img');
       img.alt=p.ar;
-      img.loading=featured?'eager':'lazy';
+      img.loading='lazy';
       img.decoding='async';
       img.src=menuPhoto?.thumbnails[0].src || (cutoutFile
         ? versionedAsset(`assets/products/cutouts/cards/${cutoutFile}`,cutoutVersion)

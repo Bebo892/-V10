@@ -131,7 +131,16 @@
   function observeProductRows() {
     if (!productObserver) return;
     productObserver.disconnect();
-    products.forEach(({ card }) => productObserver.observe(card));
+    products.forEach(({ card }) => {
+      if ($('.photo-visual, .simple-thumb',card)) productObserver.observe(card);
+    });
+  }
+  function prioritizeMenuImages() {
+    const section = menuSections.find(section => section.id === state.category);
+    $$('.product-card img', section || document).slice(0, 2).forEach(image => {
+      image.fetchPriority = 'high';
+      image.loading = 'eager';
+    });
   }
   const readablePrice = product => {
     const n = Number(product.price);
@@ -152,6 +161,7 @@
     if (!state.activeProduct && dialog.open) closeDetails();
     translatePage();
     observeProductRows();
+    prioritizeMenuImages();
     updateSticky();
   });
   document.addEventListener('menu:image-loaded', event => {
@@ -289,6 +299,7 @@
     closeSuggestions();
     const animate = recordHistory && (filter !== 'specials' || layeredFeaturedMotion.matches);
     renderResults(animate);
+    prioritizeMenuImages();
 
     const hash = `#${target.id}`;
     if (recordHistory && location.hash !== hash) history.pushState(null, '', hash);
@@ -301,13 +312,22 @@
     }
   }
   let lastStickyCategory;
+  let lastHeaderHeight;
+  let lastStickyVisibility;
   function updateSticky() {
     const h=siteHeader.getBoundingClientRect().height;
-    document.documentElement.style.setProperty('--v6-header-height',`${Math.round(h)}px`);
+    const height=Math.round(h);
+    if(height!==lastHeaderHeight){
+      document.documentElement.style.setProperty('--v6-header-height',`${height}px`);
+      lastHeaderHeight=height;
+    }
     const visible=categoriesSection.getBoundingClientRect().bottom < h+8 &&
       $('.site-footer').getBoundingClientRect().top > h+85;
-    stickyBar.classList.toggle('is-visible',visible);
-    stickyBar.setAttribute('aria-hidden',String(!visible));
+    if(visible!==lastStickyVisibility){
+      stickyBar.classList.toggle('is-visible',visible);
+      stickyBar.setAttribute('aria-hidden',String(!visible));
+      lastStickyVisibility=visible;
+    }
     if(!visible){
       lastStickyCategory=undefined;
       return;
@@ -575,15 +595,6 @@
   }, {passive: true});
   window.addEventListener('resize',updateSticky,{passive:true});
 
-  // Shimmer placeholders until each specialty image is ready.
-  $$('.photo-visual img').forEach(img=>{
-    const wrapper=img.closest('.photo-visual');
-    if(img.complete&&img.naturalWidth>0) return;
-    wrapper.classList.add('is-loading');
-    const done=()=>wrapper.classList.remove('is-loading');
-    img.addEventListener('load',done,{once:true});
-    img.addEventListener('error',done,{once:true});
-  });
   // Using real button elements means keyboard Enter/Space and accessibility work naturally.
   products.forEach(bindCardClick);
   // Fade the text out, swap RTL/LTR at the midpoint, then bring it back in.
@@ -637,6 +648,7 @@
   state.category = categoryFromLocation();
   translatePage();
   observeProductRows();
+  prioritizeMenuImages();
   syncActiveStickySection();
   const linkedItem = new URLSearchParams(location.search).get('item');
   if (linkedItem) {
