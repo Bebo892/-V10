@@ -114,25 +114,55 @@
   let products = $$('.product-card').map(makeProduct);
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const layeredFeaturedMotion = window.matchMedia('(min-width: 651px) and (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)');
-  let lastRevealScroll = window.scrollY;
-  let enteringFromTop = false;
-  const productObserver = 'IntersectionObserver' in window
+  const preparedPhotos = new WeakSet();
+  const decodedPhotos = new WeakSet();
+  const nearbyCards = new WeakSet();
+  const revealedCards = new WeakSet();
+  const photoSelector = '.photo-visual img, .simple-thumb img';
+  function preparePhotos(card) {
+    $$(photoSelector, card).forEach(image => {
+      if (preparedPhotos.has(image)) return;
+      preparedPhotos.add(image);
+      if (typeof image.decode === 'function') {
+        image.decode().then(() => decodedPhotos.add(image), () => {});
+      }
+    });
+  }
+  const canObservePhotos = 'IntersectionObserver' in window;
+  const nearbyPhotoObserver = canObservePhotos
     ? new IntersectionObserver(entries => {
       entries.forEach(({ target, isIntersecting }) => {
         if (!target.isConnected) return;
-        if (!isIntersecting) {
-          target.classList.remove('menu-row-enter', 'menu-row-enter--from-top');
-        } else if (!target.classList.contains('menu-row-enter')) {
-          target.classList.toggle('menu-row-enter--from-top', enteringFromTop);
-          target.classList.add('menu-row-enter');
+        if (isIntersecting) {
+          nearbyCards.add(target);
+          preparePhotos(target);
+        } else {
+          nearbyCards.delete(target);
+          revealedCards.delete(target);
+          target.classList.remove('menu-photo-reveal');
+        }
+      });
+    }, { rootMargin: '240px 0px' }) : null;
+  const productObserver = canObservePhotos
+    ? new IntersectionObserver(entries => {
+      entries.forEach(({ target, isIntersecting }) => {
+        if (!isIntersecting || !target.isConnected || revealedCards.has(target)) return;
+        revealedCards.add(target);
+        const images = $$(photoSelector, target);
+        if (images.length && images.every(image => decodedPhotos.has(image) ||
+            (typeof image.decode !== 'function' && image.complete && image.naturalWidth))) {
+          target.classList.add('menu-photo-reveal');
         }
       });
     }) : null;
   function observeProductRows() {
     if (!productObserver) return;
     productObserver.disconnect();
+    nearbyPhotoObserver.disconnect();
     products.forEach(({ card }) => {
-      if ($('.photo-visual, .simple-thumb',card)) productObserver.observe(card);
+      if (!$('.photo-visual, .simple-thumb',card)) return;
+      nearbyPhotoObserver.observe(card);
+      productObserver.observe(card);
     });
   }
   function prioritizeMenuImages() {
@@ -176,11 +206,12 @@
       visual.classList.add('photo-visual');
       visual.replaceChildren();
       const img=document.createElement('img');img.alt=displayName(product);
-      img.loading=product.category==='specials'?'eager':'lazy';img.src=image;
+      img.loading='eager';img.decoding='async';img.src=image;
       visual.append(img);
     }
     const thumb=$('.simple-thumb',product.card);
-    if(thumb){thumb.classList.remove('simple-thumb--pending');thumb.replaceChildren();const img=document.createElement('img');img.src=image;img.alt=displayName(product);img.loading='lazy';thumb.append(img);}
+    if(thumb){thumb.classList.remove('simple-thumb--pending');thumb.replaceChildren();const img=document.createElement('img');img.src=image;img.alt=displayName(product);img.loading='eager';img.decoding='async';thumb.append(img);}
+    if (nearbyCards.has(product.card)) preparePhotos(product.card);
     if(state.activeProduct?.id===id) updateDialog();
   });
 
@@ -444,15 +475,15 @@
 
   function closeDetails() {
     if (!dialog.open || dialog.classList.contains('is-closing')) return;
-    if (!dialog.classList.contains('is-featured') || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    if (!dialog.classList.contains('is-featured') || prefersReducedMotion.matches) {
       dialog.close();
       return;
     }
+    const { opacity, transform } = getComputedStyle(dialog);
+    dialog.style.setProperty('--dialog-exit-opacity', opacity);
+    dialog.style.setProperty('--dialog-exit-transform', transform);
     dialog.classList.add('is-closing');
-    const desktopMotion = layeredFeaturedMotion.matches;
-    const exitTarget = desktopMotion ? dialogVisual : dialog;
-    const exitName = desktopMotion ? 'featured-photo-out' : 'featured-touch-dialog-out';
-    const animation = exitTarget.getAnimations?.().find(item => item.animationName === exitName);
+    const animation = dialog.getAnimations?.().find(item => item.animationName === 'featured-dialog-out');
     if (animation) {
       const finish = () => { if (dialog.open && dialog.classList.contains('is-closing')) dialog.close(); };
       animation.finished.then(finish, finish);
@@ -583,9 +614,6 @@
     });
   }
   window.addEventListener('scroll', () => {
-    const scroll = Math.max(0, window.scrollY);
-    if (scroll !== lastRevealScroll) enteringFromTop = scroll < lastRevealScroll;
-    lastRevealScroll = scroll;
     if (scrollTick) return;
     scrollTick = true;
     requestAnimationFrame(() => {
@@ -639,6 +667,8 @@
   });
   dialog.addEventListener('close', () => {
     dialog.classList.remove('is-closing');
+    dialog.style.removeProperty('--dialog-exit-opacity');
+    dialog.style.removeProperty('--dialog-exit-transform');
     document.body.classList.remove('dialog-open');
     state.activeProduct = null;
     // Restore keyboard focus to the original item unless it was hidden by a filter.

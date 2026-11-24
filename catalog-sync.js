@@ -68,7 +68,7 @@ function makeCard(p){
   if(!detail){
     if(p.image || (p.imageSource==='firestore' && p.hasImage)){
       const thumb=document.createElement('div');addClass(thumb,'simple-thumb');
-      if(p.imageSource==='asset' && p.image){const img=document.createElement('img');img.src=versionedAsset(p.image);img.alt=p.ar;img.loading='lazy';thumb.append(img);}
+      if(p.imageSource==='asset' && p.image){const img=document.createElement('img');img.src=versionedAsset(p.image);img.alt=p.ar;img.loading='eager';img.decoding='async';thumb.append(img);}
       else thumb.classList.add('simple-thumb--pending');
       article.append(thumb);
     }
@@ -85,7 +85,7 @@ function makeCard(p){
     if(!cloud){
       const img=document.createElement('img');
       img.alt=p.ar;
-      img.loading='lazy';
+      img.loading='eager';
       img.decoding='async';
       img.src=menuPhoto?.thumbnails[0].src || (cutoutFile
         ? versionedAsset(`assets/products/cutouts/cards/${cutoutFile}`,cutoutVersion)
@@ -135,20 +135,23 @@ async function getImage(id){
   }catch(e){console.warn('Thumbnail unavailable',id,e.code||e.message);}
   finally{if(imageRequests.get(id)===request)imageRequests.delete(id);}
 }
-let observer;
+const pendingImageIds = new Set();
+let activeImageReads = 0;
+function loadQueuedImages(){
+  while(activeImageReads < 4 && pendingImageIds.size){
+    const id = pendingImageIds.values().next().value;
+    pendingImageIds.delete(id);
+    activeImageReads += 1;
+    void getImage(id).finally(() => {
+      activeImageReads -= 1;
+      loadQueuedImages();
+    });
+  }
+}
 function queueImages(cards){
-  observer?.disconnect();
-  const nearbyCards=cards.filter(card=>card.dataset.category!=='specials');
-  cards.filter(card=>card.dataset.category==='specials').forEach(card=>getImage(card.dataset.cloudImage));
-  if('IntersectionObserver' in window){
-    observer=new IntersectionObserver(entries=>{
-      entries.filter(entry=>entry.isIntersecting).forEach(entry=>{
-        observer.unobserve(entry.target);
-        getImage(entry.target.dataset.cloudImage);
-      });
-    },{rootMargin:'260px'});
-    nearbyCards.forEach(card=>observer.observe(card));
-  }else nearbyCards.forEach(card=>getImage(card.dataset.cloudImage));
+  pendingImageIds.clear();
+  cards.forEach(card => pendingImageIds.add(card.dataset.cloudImage));
+  loadQueuedImages();
 }
 function showCatalog(items){
   if(!Array.isArray(items))return;
