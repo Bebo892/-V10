@@ -56,7 +56,7 @@
     ar: {
       title: 'منيو الكافيه | حلويات مصر', skip: 'تخطي إلى المنيو', brand: 'كافيه حلويات مصر', menu: 'الأقسام',
       heroLead: 'كل لحظة أحلى في', heroName: 'كافيه حلويات مصر', intro: 'اكتشف مشروباتك المفضلة وأصناف الديسيرت من منيو الكافيه.',
-      explore: 'استكشف المنيو', searchLabel: 'بتدور على صنف معين؟', searchPlaceholder: 'جرّب: كابتشينو، أم علي، بانانا سبليت...',
+      searchLabel: 'بتدور على صنف معين؟', searchPlaceholder: 'جرّب: كابتشينو، أم علي، بانانا سبليت...',
       searchButton: 'بحث', categories: 'أقسام المنيو', showAll: 'عرض جميع الأقسام',
       currency: 'جنيه', price: 'السعر', ingredients: 'أبرز المكونات', close: 'إغلاق التفاصيل', details: 'عرض التفاصيل', specialDetails: 'التفاصيل',
       specialBadge: 'صنف مميز', plateBadge: 'من أطباقنا', plateCaption: 'من أطباق الكافيه',
@@ -78,7 +78,7 @@
     en: {
       title: 'Café Menu | Halaweyat Masr', skip: 'Skip to menu', brand: 'Halaweyat Masr Café', menu: 'Categories',
       heroLead: 'Every moment is sweeter at', heroName: 'Halaweyat Masr Café', intro: 'Explore drinks and desserts from our café menu.',
-      explore: 'Explore the menu', searchLabel: 'Looking for something?', searchPlaceholder: 'Try: Cappuccino, Om Ali, Banana Split...',
+      searchLabel: 'Looking for something?', searchPlaceholder: 'Try: Cappuccino, Om Ali, Banana Split...',
       searchButton: 'Search', categories: 'Menu Categories', showAll: 'Show all categories',
       currency: 'EGP', price: 'Price', ingredients: 'Key ingredients', close: 'Close details', details: 'View details', specialDetails: 'Details',
       specialBadge: 'Signature item', plateBadge: 'From our menu', plateCaption: 'From our café kitchen',
@@ -504,7 +504,6 @@
     $('#hero-lead').textContent = x.heroLead;
     $('#hero-name').textContent = x.heroName;
     $('.hero-content > p').textContent = x.intro;
-    $('.primary-link').textContent = x.explore;
     $('.search-form label').textContent = x.searchLabel;
     searchInput.placeholder = x.searchPlaceholder;
     $('.search-field button').textContent = x.searchButton;
