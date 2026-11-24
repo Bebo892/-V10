@@ -1853,11 +1853,12 @@ html[dir="ltr"] .product-tap:focus-visible .details-arrow { transform: scaleX(-1
 }
 
 @media (max-width: 650px) {
-  #main-content .menu-section .product-card--simple:not(:has(.simple-thumb)) .product-title { font-size: 15px; }
+  #main-content .menu-section .product-card--simple:not(:has(.simple-thumb)) .product-title { font-size: 14px; }
+  #main-content :is(#hot-drinks, #cold-drinks) .product-card--simple:not(:has(.simple-thumb)) .product-title { font-size: 13px; }
   #main-content .menu-section .product-card--simple:not(:has(.simple-thumb)) .price { font-size: 13px; }
-  #main-content .menu-section .product-card:has(:is(.simple-thumb, .photo-visual)) .product-title { font-size: 17.3px; }
+  #main-content .menu-section .product-card:has(:is(.simple-thumb, .photo-visual)) .product-title { font-size: 17px; }
   #main-content .menu-section .product-card:has(:is(.simple-thumb, .photo-visual)) .price { font-size: 16px; }
-  #product-dialog.is-featured #dialog-product-name { font-size: 22.9px; }
+  #product-dialog.is-featured #dialog-product-name { font-size: 22px; }
   #product-dialog.is-featured #dialog-price { font-size: 16px; }
   #product-dialog.is-featured #dialog-product-description { font-size: 15px; }
 }
