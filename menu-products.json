@@ -1197,13 +1197,13 @@
     "descriptionEn": "",
     "ingredientsAr": [],
     "ingredientsEn": [],
-    "image": "",
-    "imageSource": "none",
+    "image": "assets/products/cutouts/pineapple-with-cream.webp",
+    "imageSource": "asset",
     "active": true,
     "order": 66,
     "code": "1918",
     "origin": "price-sheet-2026-11",
-    "hasImage": false
+    "hasImage": true
   },
   {
     "id": "dessert-cups-1926",
@@ -1503,13 +1503,13 @@
     "descriptionEn": "",
     "ingredientsAr": [],
     "ingredientsEn": [],
-    "image": "",
-    "imageSource": "none",
+    "image": "assets/products/cutouts/roumy-croissant.webp",
+    "imageSource": "asset",
     "active": true,
     "order": 83,
     "code": "1974",
     "origin": "price-sheet-2026-11",
-    "hasImage": false
+    "hasImage": true
   },
   {
     "id": "mixed-plates-1953",

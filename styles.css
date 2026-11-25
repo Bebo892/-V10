@@ -1693,6 +1693,10 @@ html[dir="ltr"] .product-tap:focus-visible .details-arrow { transform: scaleX(-1
   background: radial-gradient(ellipse at 50% 63%, #f2d39d, #fbf0e1 69%, #fff7ee);
 }
 .is-gallery .dialog-photo-stage { touch-action: pan-y pinch-zoom; }
+.product-photo-filters { position: absolute; }
+:is(.product-card .photo-visual, .product-card .simple-thumb, .dialog-photo-stage) img {
+  filter: url(#product-photo-lighting);
+}
 .is-featured .dialog-product-image.has-photo .dialog-photo-stage img {
   width: 100%;
   height: 100%;
@@ -1701,7 +1705,7 @@ html[dir="ltr"] .product-tap:focus-visible .details-arrow { transform: scaleX(-1
   object-fit: contain;
 }
 @media (hover: hover) and (pointer: fine) {
-  .is-featured .dialog-photo-stage img { filter: drop-shadow(0 8px 12px #27162e24); }
+  .is-featured .dialog-photo-stage img { filter: url(#product-photo-lighting) drop-shadow(0 8px 12px #27162e24); }
 }
 .dialog-photo-navigation {
   display: grid;
