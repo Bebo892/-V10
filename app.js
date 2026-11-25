@@ -27,6 +27,10 @@
   const dialog = $('#product-dialog');
   const dialogClose = $('.dialog-close', dialog);
   const dialogVisual = $('#dialog-visual');
+  const dialogPhotoStage = $('#dialog-photo-stage');
+  const dialogPhotoNavigation = $('#dialog-photo-navigation');
+  const dialogPhotoStatus = $('#dialog-photo-status');
+  const dialogPhotoButtons = $$('.dialog-photo-arrow', dialogPhotoNavigation);
   const dialogCategory = $('#dialog-category');
   const dialogTitle = $('#dialog-product-name');
   const dialogDescription = $('#dialog-product-description');
@@ -58,7 +62,8 @@
       heroLead: 'كل لحظة أحلى في', heroName: 'كافيه حلويات مصر', intro: 'اكتشف مشروباتك المفضلة وأصناف الديسيرت من منيو الكافيه.',
       searchLabel: 'بتدور على صنف معين؟', searchPlaceholder: 'جرّب: كابتشينو، أم علي، بانانا سبليت...',
       searchButton: 'بحث', categories: 'أقسام المنيو', showAll: 'عرض جميع الأقسام',
-      currency: 'جنيه', price: 'السعر', ingredients: 'أبرز المكونات', close: 'إغلاق التفاصيل', details: 'عرض التفاصيل', specialDetails: 'التفاصيل',
+      currency: 'جنيه', price: 'السعر', ingredients: 'أبرز المكونات', close: 'إغلاق التفاصيل', cardDetails: 'التفاصيل',
+      previousPhoto: 'الصورة السابقة', nextPhoto: 'الصورة التالية', photoPosition: (index, total) => `${index} من ${total}`,
       specialBadge: 'صنف مميز', plateBadge: 'من أطباقنا', plateCaption: 'من أطباق الكافيه',
       footerNotice: 'هذا المنيو للعرض فقط، ولا توجد طلبات أو مدفوعات من خلال الموقع.',
       footerBrand: 'حلويات مصر', footerMenu: ' — منيو الكافيه الرقمي', top: 'العودة للأعلى ↑',
@@ -79,7 +84,8 @@
       heroLead: 'Every moment is sweeter at', heroName: 'Halaweyat Masr Café', intro: 'Explore drinks and desserts from our café menu.',
       searchLabel: 'Looking for something?', searchPlaceholder: 'Try: Cappuccino, Om Ali, Banana Split...',
       searchButton: 'Search', categories: 'Menu Categories', showAll: 'Show all categories',
-      currency: 'EGP', price: 'Price', ingredients: 'Key ingredients', close: 'Close details', details: 'View details', specialDetails: 'Details',
+      currency: 'EGP', price: 'Price', ingredients: 'Key ingredients', close: 'Close details', cardDetails: 'Details',
+      previousPhoto: 'Previous photo', nextPhoto: 'Next photo', photoPosition: (index, total) => `${index} of ${total}`,
       specialBadge: 'Signature item', plateBadge: 'From our menu', plateCaption: 'From our café kitchen',
       footerNotice: 'This menu is for viewing only. No orders or payments are accepted here.',
       footerBrand: 'Halaweyat Masr', footerMenu: ' — Digital Café Menu', top: 'Back to top ↑',
@@ -177,7 +183,7 @@
   function prepareCard(product) {
     const { card } = product;
     const layout = $('.product-tap', card);
-    const more = $('.card-more', card);
+    let more = $('.card-more', card);
     if (!product.image && !$(photoSelector, card)) {
       if (layout instanceof HTMLButtonElement) {
         const row = document.createElement('div');
@@ -205,7 +211,15 @@
     button.setAttribute('aria-haspopup', 'dialog');
     button.setAttribute('aria-controls', dialog.id);
     button.setAttribute('aria-label', t().view(displayName(product)));
-    if (more) more.hidden = false;
+    if (!more) {
+      more = document.createElement('span');
+      more.className = 'card-more';
+      more.setAttribute('aria-hidden', 'true');
+      ($('.product-footer', card) || card).append(more);
+    }
+    more.hidden = false;
+    if (!more.firstChild) more.append(document.createTextNode(''));
+    more.firstChild.textContent = t().cardDetails + ' ';
     product.trigger = button;
   }
 
@@ -488,17 +502,57 @@
 
     dialogVisual.classList.add('has-photo');
     dialogVisual.classList.toggle('has-cutout', product.card.classList.contains('has-cutout'));
-    dialogVisual.classList.toggle('is-pair', photos.length === 2);
-    dialogVisual.replaceChildren(...photos.map(photo => {
+    const gallery = photos.length > 1;
+    const previousSource = galleryProductId === product.id
+      ? dialogPhotoStage.children[dialogPhotoIndex]?.getAttribute('src')
+      : null;
+    galleryProductId = product.id;
+    dialogPhotoIndex = Math.max(0, photos.findIndex(photo => photo.src === previousSource));
+    dialogVisual.classList.toggle('is-gallery', gallery);
+    dialogPhotoNavigation.hidden = !gallery;
+    dialogPhotoButtons[0].setAttribute('aria-label', t().previousPhoto);
+    dialogPhotoButtons[1].setAttribute('aria-label', t().nextPhoto);
+    dialogPhotoStage.replaceChildren(...photos.map((photo, index) => {
       const img = document.createElement('img');
       img.alt = photo.alt;
       img.width = photo.width || 800;
       img.height = photo.height || 800;
       img.decoding = 'async';
-      img.fetchPriority = 'high';
+      img.fetchPriority = index === dialogPhotoIndex ? 'high' : 'auto';
+      img.hidden = index !== dialogPhotoIndex;
       img.src = photo.src;
       return img;
     }));
+    updatePhotoStatus();
+  }
+
+  let galleryProductId = null;
+  let dialogPhotoIndex = 0;
+  let photoPointerStart = null;
+  function updatePhotoStatus() {
+    const slide = dialogPhotoStage.children[dialogPhotoIndex];
+    const total = dialogPhotoStage.childElementCount;
+    dialogPhotoStatus.textContent = total > 1
+      ? `${slide.alt} · ${t().photoPosition(dialogPhotoIndex + 1, total)}`
+      : '';
+  }
+
+  function changeDialogPhoto(step) {
+    if (!dialog.open || dialogPhotoNavigation.hidden || dialog.classList.contains('is-closing')) return;
+    const { children, childElementCount: total } = dialogPhotoStage;
+    const previous = children[dialogPhotoIndex];
+    previous.getAnimations?.().forEach(animation => animation.cancel());
+    previous.hidden = true;
+    dialogPhotoIndex = (dialogPhotoIndex + step + total) % total;
+    const slide = children[dialogPhotoIndex];
+    slide.hidden = false;
+    updatePhotoStatus();
+    if (prefersReducedMotion.matches) return;
+    const offset = step * (state.lang === 'ar' ? -18 : 18);
+    slide.animate?.([
+      { opacity: .35, transform: `translateX(${offset}px)` },
+      { opacity: 1, transform: 'translateX(0)' }
+    ], { duration: 245, easing: 'cubic-bezier(.22,.68,.32,1)' });
   }
 
   function openDetails(product) {
@@ -560,7 +614,7 @@
       const badge = $('.product-badge', product.card);
       if (badge) badge.textContent = product.category === 'specials' ? x.specialBadge : x.plateBadge;
       const more = $('.card-more', product.card);
-      if (more) more.firstChild.textContent = (product.category === 'specials' ? x.specialDetails : x.details) + ' ';
+      if (more && product.trigger) more.firstChild.textContent = x.cardDetails + ' ';
       const caption = $('.plate-visual .plate-visual-caption', product.card);
       if (caption) caption.textContent = x.plateCaption;
       const image = $('img', product.card);
@@ -691,6 +745,28 @@
     }, 190);
   });
   dialogClose.addEventListener('click', closeDetails);
+  dialogPhotoButtons.forEach(button => button.addEventListener('click', () => {
+    changeDialogPhoto(Number(button.dataset.photoStep));
+  }));
+  dialog.addEventListener('keydown', event => {
+    if (dialogPhotoNavigation.hidden || !['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
+    event.preventDefault();
+    const forward = state.lang === 'ar' ? 'ArrowLeft' : 'ArrowRight';
+    changeDialogPhoto(event.key === forward ? 1 : -1);
+  });
+  dialogPhotoStage.addEventListener('pointerdown', event => {
+    if (dialogPhotoNavigation.hidden || !event.isPrimary || !['touch', 'pen'].includes(event.pointerType)) return;
+    photoPointerStart = { x: event.clientX, y: event.clientY, id: event.pointerId };
+  });
+  dialogPhotoStage.addEventListener('pointerup', event => {
+    if (photoPointerStart?.id !== event.pointerId) return;
+    const dx = event.clientX - photoPointerStart.x;
+    const dy = event.clientY - photoPointerStart.y;
+    photoPointerStart = null;
+    if (Math.abs(dx) < 32 || Math.abs(dx) <= Math.abs(dy) * 1.3) return;
+    changeDialogPhoto(Math.sign(dx) * (state.lang === 'ar' ? 1 : -1));
+  });
+  dialogPhotoStage.addEventListener('pointercancel', () => { photoPointerStart = null; });
   dialog.addEventListener('cancel', event => {
     event.preventDefault();
     closeDetails();
@@ -705,6 +781,8 @@
     dialog.style.removeProperty('--dialog-exit-transform');
     document.body.classList.remove('dialog-open');
     state.activeProduct = null;
+    galleryProductId = null;
+    photoPointerStart = null;
     // Restore keyboard focus to the original item unless it was hidden by a filter.
   });
 

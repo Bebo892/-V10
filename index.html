@@ -8,10 +8,10 @@
 <meta content="المنيو الرقمي لكافيه حلويات مصر: مشروبات وكاسات وأطباق متنوعة وأصناف مميزة." name="description"/>
 <title>منيو الكافيه | حلويات مصر</title>
 <link href="assets/logo.png" rel="icon" type="image/png"/>
-<link href="styles.css?v=menu-photo-details-hd-1" rel="stylesheet"/>
+<link href="styles.css?v=menu-photo-gallery-1" rel="stylesheet"/>
 <link rel="preconnect" href="https://www.gstatic.com" crossorigin/>
 <link rel="modulepreload" href="catalog-sync.js?v=menu-studio-photos-1"/>
-<script defer="" src="app.js?v=menu-photo-details-hd-1"></script>
+<script defer="" src="app.js?v=menu-photo-gallery-1"></script>
 </head>
 <body>
 <a class="skip-link" href="#main-content">تخطي إلى المنيو</a>
@@ -182,7 +182,14 @@
 <div class="dialog-shell">
 <span aria-hidden="true" class="sheet-grabber"></span>
 <button aria-label="إغلاق التفاصيل" class="dialog-close" type="button"><span class="dialog-close-mark" aria-hidden="true"></span></button>
-<div class="dialog-product-image" id="dialog-visual"></div>
+<div class="dialog-product-image" id="dialog-visual">
+<div class="dialog-photo-stage" id="dialog-photo-stage"></div>
+<div class="dialog-photo-navigation" id="dialog-photo-navigation" hidden>
+<button class="dialog-photo-arrow" data-photo-step="-1" type="button"><span aria-hidden="true">&#x2039;</span></button>
+<span class="dialog-photo-status" id="dialog-photo-status" role="status" aria-atomic="true"></span>
+<button class="dialog-photo-arrow" data-photo-step="1" type="button"><span aria-hidden="true">&#x203A;</span></button>
+</div>
+</div>
 <div class="dialog-copy">
 <p class="dialog-category" id="dialog-category"></p>
 <h2 id="dialog-product-name"></h2>
