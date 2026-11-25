@@ -1749,9 +1749,9 @@ button.product-tap { cursor: pointer; }
   outline: 3px solid #9B78B3;
   outline-offset: -3px;
 }
-#mixed-plates .photo-visual--pair img { width: 53%; }
-#mixed-plates .photo-visual--pair img:first-child { inset-inline: 0 auto; }
-#mixed-plates .photo-visual--pair img:last-child { inset-inline: auto 0; }
+.menu-photo-grid .photo-visual--pair img { width: 53%; }
+.menu-photo-grid .photo-visual--pair img:first-child { inset-inline: 0 auto; }
+.menu-photo-grid .photo-visual--pair img:last-child { inset-inline: auto 0; }
 
 @media (prefers-reduced-motion: no-preference) {
   .menu-photo-reveal :is(.photo-visual, .simple-thumb) img {

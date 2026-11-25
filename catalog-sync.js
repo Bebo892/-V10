@@ -84,10 +84,11 @@ function makeCard(p){
     addClass(visual,'product-visual photo-visual'+(cloud?' photo-visual--pending':''));
     if(!cloud){
       const img=document.createElement('img');
-      img.alt=p.ar;
+      const thumbnail = menuPhoto?.thumbnails[0];
+      img.alt=thumbnail?.alt || p.ar;
       img.loading='eager';
       img.decoding='async';
-      img.src=menuPhoto?.thumbnails[0].src || (cutoutFile
+      img.src=thumbnail?.src || (cutoutFile
         ? versionedAsset(`assets/products/cutouts/cards/${cutoutFile}`,cutoutVersion)
         : article.dataset.image);
       visual.append(img);

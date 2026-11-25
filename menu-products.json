@@ -315,13 +315,13 @@
     "descriptionEn": "",
     "ingredientsAr": [],
     "ingredientsEn": [],
-    "image": "",
-    "imageSource": "none",
+    "image": "assets/products/cutouts/canned-ice-cream-mango.webp",
+    "imageSource": "asset",
     "active": true,
     "order": 17,
     "code": "2455",
     "origin": "price-sheet-2026-11",
-    "hasImage": false
+    "hasImage": true
   },
   {
     "id": "dessert-cups-2462",
@@ -1449,13 +1449,13 @@
     "descriptionEn": "",
     "ingredientsAr": [],
     "ingredientsEn": [],
-    "image": "",
-    "imageSource": "none",
+    "image": "assets/products/cutouts/rice-pudding-kunafa.webp",
+    "imageSource": "asset",
     "active": true,
     "order": 80,
     "code": "1935",
     "origin": "price-sheet-2026-11",
-    "hasImage": false
+    "hasImage": true
   },
   {
     "id": "mixed-plates-2016",
@@ -2007,13 +2007,13 @@
     "descriptionEn": "",
     "ingredientsAr": [],
     "ingredientsEn": [],
-    "image": "",
-    "imageSource": "none",
+    "image": "assets/products/cutouts/caramel-tres-leches.webp",
+    "imageSource": "asset",
     "active": true,
     "order": 111,
     "code": "06740802",
     "origin": "price-sheet-2026-11",
-    "hasImage": false
+    "hasImage": true
   },
   {
     "id": "mixed-plates-06740805",
@@ -2043,13 +2043,13 @@
     "descriptionEn": "",
     "ingredientsAr": [],
     "ingredientsEn": [],
-    "image": "",
-    "imageSource": "none",
+    "image": "assets/products/cutouts/nutella-tres-leches.webp",
+    "imageSource": "asset",
     "active": true,
     "order": 113,
     "code": "06740806",
     "origin": "price-sheet-2026-11",
-    "hasImage": false
+    "hasImage": true
   },
   {
     "id": "mixed-plates-06741728",
@@ -2132,13 +2132,13 @@
     "descriptionEn": "",
     "ingredientsAr": [],
     "ingredientsEn": [],
-    "image": "",
-    "imageSource": "none",
+    "image": "assets/products/cutouts/waffle-chocolate.webp",
+    "imageSource": "asset",
     "active": true,
     "order": 117,
     "code": "2379",
     "origin": "price-sheet-2026-11",
-    "hasImage": false
+    "hasImage": true
   },
   {
     "id": "mixed-plates-2381",
