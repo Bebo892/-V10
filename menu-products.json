@@ -1593,13 +1593,13 @@
     "descriptionEn": "",
     "ingredientsAr": [],
     "ingredientsEn": [],
-    "image": "",
-    "imageSource": "none",
+    "image": "assets/products/cutouts/creme-caramel.webp",
+    "imageSource": "asset",
     "active": true,
     "order": 88,
     "code": "1910",
     "origin": "price-sheet-2026-11",
-    "hasImage": false
+    "hasImage": true
   },
   {
     "id": "mixed-plates-1934",
