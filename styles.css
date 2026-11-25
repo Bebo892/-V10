@@ -1691,8 +1691,6 @@ html[dir="ltr"] .product-tap:focus-visible .details-arrow { transform: scaleX(-1
 }
 .is-featured .dialog-close:hover::before { background: #40234d; }
 .is-featured .dialog-close:focus-visible { outline: 2px solid #f1d49b; outline-offset: 2px; }
-.product-dialog:has(#dialog-visual[hidden]) { width: min(480px, calc(100vw - 48px)); }
-.is-featured .dialog-shell:has(#dialog-visual[hidden]) { grid-template-columns: minmax(0, 1fr); }
 .is-featured .dialog-product-image.has-photo.is-pair {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1724,10 +1722,6 @@ html[dir="ltr"] .product-tap:focus-visible .details-arrow { transform: scaleX(-1
     height: 44px;
   }
   .is-featured .sheet-grabber { display: none; }
-  .product-dialog:has(#dialog-visual[hidden]) { width: 100%; }
-  .is-featured .dialog-shell:has(#dialog-visual[hidden]) .dialog-copy {
-    padding-block-start: 65px;
-  }
 }
 
 .menu-photo-grid { margin-block-start: 20px; }

@@ -1,7 +1,7 @@
 /**
  * Halaweyat Masr Café — display-only digital menu, v8.1.
  * All product names, prices, descriptions and pictures come from index.html.
- * All product cards can open the shared details dialog.
+ * Product cards with photos can open the shared details dialog.
  */
 (() => {
   'use strict';
@@ -177,6 +177,18 @@
   function prepareCard(product) {
     const { card } = product;
     const layout = $('.product-tap', card);
+    const more = $('.card-more', card);
+    if (!product.image && !$(photoSelector, card)) {
+      if (layout instanceof HTMLButtonElement) {
+        const row = document.createElement('div');
+        row.className = layout.className;
+        row.append(...layout.childNodes);
+        layout.replaceWith(row);
+      }
+      if (more) more.hidden = true;
+      return;
+    }
+
     let button = layout instanceof HTMLButtonElement ? layout : $('.product-open', card);
     if (!button) {
       button = document.createElement('button');
@@ -192,6 +204,8 @@
     }
     button.setAttribute('aria-haspopup', 'dialog');
     button.setAttribute('aria-controls', dialog.id);
+    button.setAttribute('aria-label', t().view(displayName(product)));
+    if (more) more.hidden = false;
     product.trigger = button;
   }
 
@@ -206,7 +220,7 @@
     const activeId = state.activeProduct?.id;
     products = $$('.product-card').map(makeProduct);
     products.forEach(prepareCard);
-    state.activeProduct = products.find(p => p.id === activeId) || null;
+    state.activeProduct = products.find(p => p.id === activeId && p.trigger) || null;
     if (!state.activeProduct && dialog.open) closeDetails();
     translatePage();
     observeProductRows();
@@ -230,8 +244,9 @@
     }
     const thumb=$('.simple-thumb',product.card);
     if(thumb){thumb.classList.remove('simple-thumb--pending');thumb.replaceChildren();const img=document.createElement('img');img.src=image;img.alt=displayName(product);img.loading='eager';img.decoding='async';thumb.append(img);}
+    prepareCard(product);
     if (nearbyCards.has(product.card)) preparePhotos(product.card);
-    if(state.activeProduct?.id===id) updateDialog();
+    if (state.activeProduct?.id === id) updateDialog();
   });
 
   const normalize = value => String(value || '').toLocaleLowerCase().normalize('NFKC')
@@ -329,7 +344,8 @@
       button.addEventListener('click',()=>{
         state.query=''; state.category='all';
         searchInput.value=''; renderResults(); closeSuggestions();
-        openDetails(product);
+        if (product.trigger) openDetails(product);
+        else product.card.scrollIntoView({ behavior: scrollBehavior(), block: 'center' });
       });
       suggestions.append(button);
     });
@@ -461,30 +477,32 @@
       dialogIngredientChips.appendChild(chip);
     });
     const thumbnails = $$(photoSelector, product.card);
-    const photos = thumbnails.map(image => ({
-      src: image.currentSrc || image.getAttribute('src'),
-      alt: image.alt
-    })).filter(photo => photo.src);
-    if (product.category === 'specials' || !photos.length) {
-      if (product.image) photos.splice(0, photos.length, { src: product.image, alt: displayName(product) });
-    }
-    dialogVisual.hidden = photos.length === 0;
-    dialogVisual.classList.toggle('has-photo', photos.length > 0);
-    dialogVisual.classList.toggle('has-cutout', photos.length > 0 && product.card.classList.contains('has-cutout'));
+    const photos = thumbnails.map((thumbnail, index) => ({
+      src: (index === 0 && product.image) ||
+        thumbnail.getAttribute('src').replace('assets/products/cutouts/cards/', 'assets/products/cutouts/'),
+      alt: thumbnail.alt,
+      width: thumbnail.naturalWidth,
+      height: thumbnail.naturalHeight
+    }));
+    if (!photos.length) photos.push({ src: product.image, alt: displayName(product) });
+
+    dialogVisual.classList.add('has-photo');
+    dialogVisual.classList.toggle('has-cutout', product.card.classList.contains('has-cutout'));
     dialogVisual.classList.toggle('is-pair', photos.length === 2);
     dialogVisual.replaceChildren(...photos.map(photo => {
       const img = document.createElement('img');
-      img.src = photo.src;
       img.alt = photo.alt;
-      img.width = 800;
-      img.height = 650;
+      img.width = photo.width || 800;
+      img.height = photo.height || 800;
       img.decoding = 'async';
+      img.fetchPriority = 'high';
+      img.src = photo.src;
       return img;
     }));
   }
 
   function openDetails(product) {
-    if (!product) return;
+    if (!product?.trigger) return;
     state.activeProduct = product;
     updateDialog();
     if (!dialog.open) dialog.showModal();
@@ -538,7 +556,7 @@
     products.forEach(product => {
       const name = displayName(product);
       $('.product-title',product.card).textContent = name;
-      product.trigger.setAttribute('aria-label', x.view(name));
+      product.trigger?.setAttribute('aria-label', x.view(name));
       const badge = $('.product-badge', product.card);
       if (badge) badge.textContent = product.category === 'specials' ? x.specialBadge : x.plateBadge;
       const more = $('.card-more', product.card);
@@ -698,7 +716,7 @@
   syncActiveStickySection();
   const linkedItem = new URLSearchParams(location.search).get('item');
   if (linkedItem) {
-    const matched = products.find(p => normalize(p.name) === normalize(linkedItem) || normalize(p.en) === normalize(linkedItem));
+    const matched = products.find(p => p.trigger && (normalize(p.name) === normalize(linkedItem) || normalize(p.en) === normalize(linkedItem)));
     if (matched) openDetails(matched);
   }
 })();
