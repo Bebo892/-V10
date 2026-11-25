@@ -184,10 +184,7 @@
     const { card } = product;
     const layout = $('.product-tap', card);
     let more = $('.card-more', card);
-    const hasPhoto = Boolean(product.image || $(photoSelector, card));
-    card.classList.toggle('product-card--compact', product.category !== 'specials' &&
-      (hasPhoto || card.hasAttribute('data-cloud-image')));
-    if (!hasPhoto) {
+    if (!product.image && !$(photoSelector, card)) {
       if (layout instanceof HTMLButtonElement) {
         const row = document.createElement('div');
         row.className = layout.className;
@@ -473,7 +470,6 @@
   function updateDialog() {
     const product = state.activeProduct;
     if (!product) return;
-    dialog.classList.toggle('is-compact', product.category !== 'specials');
     dialogCategory.textContent = categoryName(product.category);
     dialogTitle.textContent = displayName(product);
     dialogDescription.textContent = displayDescription(product);
