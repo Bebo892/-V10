@@ -135,13 +135,13 @@
     "descriptionEn": "",
     "ingredientsAr": [],
     "ingredientsEn": [],
-    "image": "",
-    "imageSource": "none",
+    "image": "assets/products/cutouts/ice-cream-nuts-single.webp",
+    "imageSource": "asset",
     "active": true,
     "order": 7,
     "code": "1958",
     "origin": "price-sheet-2026-11",
-    "hasImage": false
+    "hasImage": true
   },
   {
     "id": "dessert-cups-1959",
@@ -153,13 +153,13 @@
     "descriptionEn": "",
     "ingredientsAr": [],
     "ingredientsEn": [],
-    "image": "",
-    "imageSource": "none",
+    "image": "assets/products/cutouts/ice-cream-nuts-double.webp",
+    "imageSource": "asset",
     "active": true,
     "order": 8,
     "code": "1959",
     "origin": "price-sheet-2026-11",
-    "hasImage": false
+    "hasImage": true
   },
   {
     "id": "dessert-cups-2192",
@@ -171,13 +171,13 @@
     "descriptionEn": "",
     "ingredientsAr": [],
     "ingredientsEn": [],
-    "image": "",
-    "imageSource": "none",
+    "image": "assets/products/cutouts/fruit-ice-cream.webp",
+    "imageSource": "asset",
     "active": true,
     "order": 9,
     "code": "2192",
     "origin": "price-sheet-2026-11",
-    "hasImage": false
+    "hasImage": true
   },
   {
     "id": "dessert-cups-1960",
@@ -189,13 +189,13 @@
     "descriptionEn": "",
     "ingredientsAr": [],
     "ingredientsEn": [],
-    "image": "",
-    "imageSource": "none",
+    "image": "assets/products/cutouts/soft-serve-no-plate.webp",
+    "imageSource": "asset",
     "active": true,
     "order": 10,
     "code": "1960",
     "origin": "price-sheet-2026-11",
-    "hasImage": false
+    "hasImage": true
   },
   {
     "id": "dessert-cups-2026",
@@ -207,13 +207,13 @@
     "descriptionEn": "",
     "ingredientsAr": [],
     "ingredientsEn": [],
-    "image": "",
-    "imageSource": "none",
+    "image": "assets/products/cutouts/soft-serve-sauce-no-plate.webp",
+    "imageSource": "asset",
     "active": true,
     "order": 11,
     "code": "2026",
     "origin": "price-sheet-2026-11",
-    "hasImage": false
+    "hasImage": true
   },
   {
     "id": "dessert-cups-1968",
@@ -227,7 +227,7 @@
     "ingredientsEn": [],
     "image": "",
     "imageSource": "none",
-    "active": true,
+    "active": false,
     "order": 12,
     "code": "1968",
     "origin": "price-sheet-2026-11",
@@ -245,7 +245,7 @@
     "ingredientsEn": [],
     "image": "",
     "imageSource": "none",
-    "active": true,
+    "active": false,
     "order": 13,
     "code": "536",
     "origin": "price-sheet-2026-11",
@@ -1215,13 +1215,13 @@
     "descriptionEn": "",
     "ingredientsAr": [],
     "ingredientsEn": [],
-    "image": "",
-    "imageSource": "none",
+    "image": "assets/products/cutouts/fruit-cocktail-cream.webp",
+    "imageSource": "asset",
     "active": true,
     "order": 67,
     "code": "1926",
     "origin": "price-sheet-2026-11",
-    "hasImage": false
+    "hasImage": true
   },
   {
     "id": "dessert-cups-1920",
@@ -1269,7 +1269,7 @@
     "descriptionEn": "",
     "ingredientsAr": [],
     "ingredientsEn": [],
-    "image": "assets/products/cutouts/plain-custard.webp",
+    "image": "assets/products/cutouts/plain-custard-studio.webp",
     "imageSource": "asset",
     "active": true,
     "order": 70,
@@ -1287,13 +1287,13 @@
     "descriptionEn": "",
     "ingredientsAr": [],
     "ingredientsEn": [],
-    "image": "",
-    "imageSource": "none",
+    "image": "assets/products/cutouts/custard-nuts.webp",
+    "imageSource": "asset",
     "active": true,
     "order": 71,
     "code": "1913",
     "origin": "price-sheet-2026-11",
-    "hasImage": false
+    "hasImage": true
   },
   {
     "id": "dessert-cups-763",
@@ -1341,7 +1341,7 @@
     "descriptionEn": "",
     "ingredientsAr": [],
     "ingredientsEn": [],
-    "image": "assets/products/cutouts/plain-ashoura.webp",
+    "image": "assets/products/cutouts/plain-ashoura-studio.webp",
     "imageSource": "asset",
     "active": true,
     "order": 74,
@@ -1359,13 +1359,13 @@
     "descriptionEn": "",
     "ingredientsAr": [],
     "ingredientsEn": [],
-    "image": "",
-    "imageSource": "none",
+    "image": "assets/products/cutouts/ashoura-nuts.webp",
+    "imageSource": "asset",
     "active": true,
     "order": 75,
     "code": "1912",
     "origin": "price-sheet-2026-11",
-    "hasImage": false
+    "hasImage": true
   },
   {
     "id": "dessert-cups-1929",
@@ -1377,13 +1377,13 @@
     "descriptionEn": "",
     "ingredientsAr": [],
     "ingredientsEn": [],
-    "image": "",
-    "imageSource": "none",
+    "image": "assets/products/cutouts/plain-rice-pudding.webp",
+    "imageSource": "asset",
     "active": true,
     "order": 76,
     "code": "1929",
     "origin": "price-sheet-2026-11",
-    "hasImage": false
+    "hasImage": true
   },
   {
     "id": "dessert-cups-1911",
@@ -1395,13 +1395,13 @@
     "descriptionEn": "",
     "ingredientsAr": [],
     "ingredientsEn": [],
-    "image": "",
-    "imageSource": "none",
+    "image": "assets/products/cutouts/rice-pudding-nuts.webp",
+    "imageSource": "asset",
     "active": true,
     "order": 77,
     "code": "1911",
     "origin": "price-sheet-2026-11",
-    "hasImage": false
+    "hasImage": true
   },
   {
     "id": "dessert-cups-1937",
@@ -1415,7 +1415,7 @@
     "ingredientsEn": [],
     "image": "",
     "imageSource": "none",
-    "active": true,
+    "active": false,
     "order": 78,
     "code": "1937",
     "origin": "price-sheet-2026-11",
@@ -1431,13 +1431,13 @@
     "descriptionEn": "",
     "ingredientsAr": [],
     "ingredientsEn": [],
-    "image": "",
-    "imageSource": "none",
+    "image": "assets/products/cutouts/rice-pudding-ice-cream.webp",
+    "imageSource": "asset",
     "active": true,
     "order": 79,
     "code": "1930",
     "origin": "price-sheet-2026-11",
-    "hasImage": false
+    "hasImage": true
   },
   {
     "id": "dessert-cups-1935",
@@ -1467,7 +1467,7 @@
     "descriptionEn": "",
     "ingredientsAr": [],
     "ingredientsEn": [],
-    "image": "assets/products/cutouts/original-gateau.webp",
+    "image": "assets/products/cutouts/original-gateau-studio-1.webp",
     "imageSource": "asset",
     "active": true,
     "order": 81,
@@ -1665,13 +1665,13 @@
     "descriptionEn": "",
     "ingredientsAr": [],
     "ingredientsEn": [],
-    "image": "",
-    "imageSource": "none",
+    "image": "assets/products/cutouts/choco-up.webp",
+    "imageSource": "asset",
     "active": true,
     "order": 92,
     "code": "1919",
     "origin": "price-sheet-2026-11",
-    "hasImage": false
+    "hasImage": true
   },
   {
     "id": "mixed-plates-784",
@@ -1683,13 +1683,13 @@
     "descriptionEn": "",
     "ingredientsAr": [],
     "ingredientsEn": [],
-    "image": "",
-    "imageSource": "none",
+    "image": "assets/products/cutouts/shamiya-plate.webp",
+    "imageSource": "asset",
     "active": true,
     "order": 93,
     "code": "784",
     "origin": "price-sheet-2026-11",
-    "hasImage": false
+    "hasImage": true
   },
   {
     "id": "mixed-plates-538",
@@ -1703,7 +1703,7 @@
     "ingredientsEn": [],
     "image": "",
     "imageSource": "none",
-    "active": true,
+    "active": false,
     "order": 94,
     "code": "538",
     "origin": "price-sheet-2026-11",
@@ -1719,13 +1719,13 @@
     "descriptionEn": "",
     "ingredientsAr": [],
     "ingredientsEn": [],
-    "image": "",
-    "imageSource": "none",
+    "image": "assets/products/cutouts/salizon-plate.webp",
+    "imageSource": "asset",
     "active": true,
     "order": 95,
     "code": "786",
     "origin": "price-sheet-2026-11",
-    "hasImage": false
+    "hasImage": true
   },
   {
     "id": "mixed-plates-2003",
@@ -1755,13 +1755,13 @@
     "descriptionEn": "",
     "ingredientsAr": [],
     "ingredientsEn": [],
-    "image": "",
-    "imageSource": "none",
+    "image": "assets/products/cutouts/molten-cake-ice-cream.webp",
+    "imageSource": "asset",
     "active": true,
     "order": 97,
     "code": "1984",
     "origin": "price-sheet-2026-11",
-    "hasImage": false
+    "hasImage": true
   },
   {
     "id": "mixed-plates-201500",
@@ -1863,7 +1863,7 @@
     "descriptionEn": "",
     "ingredientsAr": [],
     "ingredientsEn": [],
-    "image": "assets/products/cutouts/mousse-cake.webp",
+    "image": "assets/products/cutouts/mousse-gateau-studio-1.webp",
     "imageSource": "asset",
     "active": true,
     "order": 103,
@@ -1901,7 +1901,7 @@
     "ingredientsEn": [],
     "image": "",
     "imageSource": "none",
-    "active": true,
+    "active": false,
     "order": 105,
     "code": "1928",
     "origin": "price-sheet-2026-11",
@@ -1935,7 +1935,7 @@
     "descriptionEn": "",
     "ingredientsAr": [],
     "ingredientsEn": [],
-    "image": "assets/products/cutouts/despacito.webp",
+    "image": "assets/products/cutouts/despacito-small.webp",
     "imageSource": "asset",
     "active": true,
     "order": 107,
@@ -1953,7 +1953,7 @@
     "descriptionEn": "",
     "ingredientsAr": [],
     "ingredientsEn": [],
-    "image": "assets/products/cutouts/despacito.webp",
+    "image": "assets/products/cutouts/despacito-medium.webp",
     "imageSource": "asset",
     "active": true,
     "order": 108,
@@ -2027,7 +2027,7 @@
     "ingredientsEn": [],
     "image": "",
     "imageSource": "none",
-    "active": true,
+    "active": false,
     "order": 112,
     "code": "06740805",
     "origin": "price-sheet-2026-11",
@@ -2089,20 +2089,20 @@
   {
     "id": "mixed-plates-2209",
     "category": "mixed-plates",
-    "ar": "سينابون رول شيكولاتة/كراميل",
-    "en": "Cinnamon Roll Chocolate / Caramel",
+    "ar": "سينابون رول شيكولاتة/كراميل/فسدق",
+    "en": "Cinnamon Roll with Chocolate / Caramel / Pistachio",
     "price": 70,
     "descriptionAr": "",
     "descriptionEn": "",
     "ingredientsAr": [],
     "ingredientsEn": [],
-    "image": "",
-    "imageSource": "none",
+    "image": "assets/products/cutouts/cinnamon-roll-chocolate.webp",
+    "imageSource": "asset",
     "active": true,
     "order": 115,
     "code": "2209",
     "origin": "price-sheet-2026-11",
-    "hasImage": false
+    "hasImage": true
   },
   {
     "id": "mixed-plates-06741892",

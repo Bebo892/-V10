@@ -94,10 +94,14 @@ function makeCard(p){
       visual.append(img);
       if(menuPhoto?.thumbnails.length>1){
         visual.classList.add('photo-visual--pair');
-        const second=img.cloneNode();
-        second.src=menuPhoto.thumbnails[1].src;
-        second.alt=menuPhoto.thumbnails[1].alt;
-        visual.append(second);
+        for (const thumbnail of menuPhoto.thumbnails.slice(1)) {
+          const alternate = document.createElement('img');
+          alternate.loading = 'lazy';
+          alternate.decoding = 'async';
+          alternate.alt = thumbnail.alt;
+          alternate.src = thumbnail.src;
+          visual.append(alternate);
+        }
       }
     }else visual.append(txt('span','جاري تحميل الصورة…','plate-visual-caption'));
   }else{

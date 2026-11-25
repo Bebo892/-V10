@@ -122,8 +122,9 @@
   const nearbyCards = new WeakSet();
   const revealedCards = new WeakSet();
   const photoSelector = '.photo-visual img, .simple-thumb img';
+  const coverPhotoSelector = '.photo-visual img:first-of-type, .simple-thumb img';
   function preparePhotos(card) {
-    $$(photoSelector, card).forEach(image => {
+    $$(coverPhotoSelector, card).forEach(image => {
       if (preparedPhotos.has(image)) return;
       preparedPhotos.add(image);
       if (typeof image.decode === 'function') {
@@ -151,7 +152,7 @@
       entries.forEach(({ target, isIntersecting }) => {
         if (!isIntersecting || !target.isConnected || revealedCards.has(target)) return;
         revealedCards.add(target);
-        const images = $$(photoSelector, target);
+        const images = $$(coverPhotoSelector, target);
         if (images.length && images.every(image => decodedPhotos.has(image) ||
             (typeof image.decode !== 'function' && image.complete && image.naturalWidth))) {
           target.classList.add('menu-photo-reveal');
@@ -170,7 +171,8 @@
   }
   function prioritizeMenuImages() {
     const section = menuSections.find(section => section.id === state.category);
-    $$('.product-card img', section || document).slice(0, 2).forEach(image => {
+    $$('.product-card', section || document)
+      .map(card => $(coverPhotoSelector, card)).filter(Boolean).slice(0, 2).forEach(image => {
       image.fetchPriority = 'high';
       image.loading = 'eager';
     });
@@ -518,6 +520,7 @@
       img.width = photo.width || 800;
       img.height = photo.height || 800;
       img.decoding = 'async';
+      img.loading = index === dialogPhotoIndex ? 'eager' : 'lazy';
       img.fetchPriority = index === dialogPhotoIndex ? 'high' : 'auto';
       img.hidden = index !== dialogPhotoIndex;
       img.src = photo.src;
@@ -545,6 +548,8 @@
     previous.hidden = true;
     dialogPhotoIndex = (dialogPhotoIndex + step + total) % total;
     const slide = children[dialogPhotoIndex];
+    slide.loading = 'eager';
+    slide.fetchPriority = 'high';
     slide.hidden = false;
     updatePhotoStatus();
     if (prefersReducedMotion.matches) return;
