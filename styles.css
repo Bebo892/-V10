@@ -675,8 +675,6 @@ body.dialog-open { overflow: hidden; }
   width: 100%; height: 100%;
   object-fit: contain;
 }
-.dialog-placeholder-mark { position: relative; z-index: 1; color: #80599B; font-size: clamp(6rem,14vw,10rem); line-height: 1; }
-.dialog-placeholder-caption { position: relative; z-index: 1; max-width: 210px; text-align: center; color: #604276; font-size: .9rem; font-weight: 700; }
 .dialog-copy {
   display: flex;
   flex-direction: column;
@@ -1191,8 +1189,6 @@ body { background: var(--cream); color: var(--text); }
 }
 .dialog-product-image.has-photo { background: #F8F3FB; }
 .dialog-product-image::after { border-color: rgba(133,93,159,.16); }
-.dialog-placeholder-mark { color: #A183B5; }
-.dialog-placeholder-caption { color: #654C78; }
 .dialog-category { background: #F1E6F5; color: #76508D; border-color: #E0CDE9; }
 .dialog-copy h2 { color: #2C1A38; }
 .dialog-description { color: #6C5E78; }
@@ -1651,8 +1647,7 @@ html[dir="ltr"] .product-tap:focus-visible .details-arrow { transform: scaleX(-1
   background: #fff5df;
 }
 .is-featured .dialog-description,
-.is-featured .dialog-ingredients-label,
-.is-featured .dialog-placeholder-caption { color: #634d4b; }
+.is-featured .dialog-ingredients-label { color: #634d4b; }
 .is-featured .dialog-description { grid-area: description; margin: 10px 0 0; }
 .is-featured .dialog-ingredients { grid-area: ingredients; }
 .is-featured .dialog-price-row {
@@ -1696,6 +1691,13 @@ html[dir="ltr"] .product-tap:focus-visible .details-arrow { transform: scaleX(-1
 }
 .is-featured .dialog-close:hover::before { background: #40234d; }
 .is-featured .dialog-close:focus-visible { outline: 2px solid #f1d49b; outline-offset: 2px; }
+.product-dialog:has(#dialog-visual[hidden]) { width: min(480px, calc(100vw - 48px)); }
+.is-featured .dialog-shell:has(#dialog-visual[hidden]) { grid-template-columns: minmax(0, 1fr); }
+.is-featured .dialog-product-image.has-photo.is-pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0;
+}
 
 @media (max-width: 650px) {
   .is-featured .dialog-product-image.has-photo {
@@ -1722,13 +1724,31 @@ html[dir="ltr"] .product-tap:focus-visible .details-arrow { transform: scaleX(-1
     height: 44px;
   }
   .is-featured .sheet-grabber { display: none; }
+  .product-dialog:has(#dialog-visual[hidden]) { width: 100%; }
+  .is-featured .dialog-shell:has(#dialog-visual[hidden]) .dialog-copy {
+    padding-block-start: 65px;
+  }
 }
 
 .menu-photo-grid { margin-block-start: 20px; }
 .menu-photo-grid:not(:has(.product-card:not([hidden]))) { display: none; }
 :is(#dessert-cups-photos, #mixed-plates-photos) .product-visual { aspect-ratio: 1; }
 
-[data-menu-photo] .product-tap { cursor: default; }
+button.product-tap { cursor: pointer; }
+.product-card--simple { position: relative; }
+.product-open {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  cursor: pointer;
+}
+.product-open:focus-visible {
+  outline: 3px solid #9B78B3;
+  outline-offset: -3px;
+}
 #mixed-plates .photo-visual--pair img { width: 53%; }
 #mixed-plates .photo-visual--pair img:first-child { inset-inline: 0 auto; }
 #mixed-plates .photo-visual--pair img:last-child { inset-inline: auto 0; }

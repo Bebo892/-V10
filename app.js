@@ -1,7 +1,7 @@
 /**
  * Halaweyat Masr Café — display-only digital menu, v8.1.
  * All product names, prices, descriptions and pictures come from index.html.
- * Only `mixed-plates` and `specials` can open the details dialog.
+ * All product cards can open the shared details dialog.
  */
 (() => {
   'use strict';
@@ -60,7 +60,6 @@
       searchButton: 'بحث', categories: 'أقسام المنيو', showAll: 'عرض جميع الأقسام',
       currency: 'جنيه', price: 'السعر', ingredients: 'أبرز المكونات', close: 'إغلاق التفاصيل', details: 'عرض التفاصيل', specialDetails: 'التفاصيل',
       specialBadge: 'صنف مميز', plateBadge: 'من أطباقنا', plateCaption: 'من أطباق الكافيه',
-      photoPending: 'صورة الطبق هتتضاف قريبًا',
       footerNotice: 'هذا المنيو للعرض فقط، ولا توجد طلبات أو مدفوعات من خلال الموقع.',
       footerBrand: 'حلويات مصر', footerMenu: ' — منيو الكافيه الرقمي', top: 'العودة للأعلى ↑',
       noMatches: 'مفيش أصناف مطابقة للبحث. جرّب كلمة تانية.',
@@ -82,7 +81,6 @@
       searchButton: 'Search', categories: 'Menu Categories', showAll: 'Show all categories',
       currency: 'EGP', price: 'Price', ingredients: 'Key ingredients', close: 'Close details', details: 'View details', specialDetails: 'Details',
       specialBadge: 'Signature item', plateBadge: 'From our menu', plateCaption: 'From our café kitchen',
-      photoPending: 'Photo coming soon',
       footerNotice: 'This menu is for viewing only. No orders or payments are accepted here.',
       footerBrand: 'Halaweyat Masr', footerMenu: ' — Digital Café Menu', top: 'Back to top ↑',
       noMatches: 'No matching items. Try another search.',
@@ -108,7 +106,6 @@
     descriptionEn: card.dataset.descriptionEn || '', image: card.dataset.image || '',
     ingredientsAr: (card.dataset.ingredientsAr || '').split('|').filter(Boolean),
     ingredientsEn: (card.dataset.ingredientsEn || '').split('|').filter(Boolean),
-    clickable: !card.hasAttribute('data-menu-photo') && ['mixed-plates','specials'].includes(card.dataset.category),
     aliases: card.dataset.aliases || ''
   });
   let products = $$('.product-card').map(makeProduct);
@@ -177,17 +174,39 @@
     return product.price !== '' && product.price != null && Number.isFinite(n) && n > 0
       ? `${n} ${t().currency}` : (state.lang === 'ar' ? 'اسأل عن السعر' : 'Ask for price');
   };
-  const bindCardClick = product => {
-    if (!product.clickable) return;
-    $('.product-tap',product.card)?.addEventListener('click',()=>openDetails(product));
-  };
+  function prepareCard(product) {
+    const { card } = product;
+    const layout = $('.product-tap', card);
+    let button = layout instanceof HTMLButtonElement ? layout : $('.product-open', card);
+    if (!button) {
+      button = document.createElement('button');
+      button.type = 'button';
+      if (layout) {
+        button.className = layout.className;
+        button.append(...layout.childNodes);
+        layout.replaceWith(button);
+      } else {
+        button.className = 'product-open';
+        card.append(button);
+      }
+    }
+    button.setAttribute('aria-haspopup', 'dialog');
+    button.setAttribute('aria-controls', dialog.id);
+    product.trigger = button;
+  }
+
+  $('#main-content').addEventListener('click', event => {
+    const button = event.target.closest('button:is(.product-tap, .product-open)');
+    if (!button) return;
+    openDetails(products.find(product => product.trigger === button));
+  });
   // The new admin manages a single /menu/catalog document. The public menu has
   // its original static products as an offline fallback and accepts live updates.
   document.addEventListener('menu:catalog-updated', event => {
     const activeId = state.activeProduct?.id;
     products = $$('.product-card').map(makeProduct);
-    products.forEach(bindCardClick);
-    state.activeProduct = products.find(p=>p.id===activeId && p.clickable) || null;
+    products.forEach(prepareCard);
+    state.activeProduct = products.find(p => p.id === activeId) || null;
     if (!state.activeProduct && dialog.open) closeDetails();
     translatePage();
     observeProductRows();
@@ -310,8 +329,7 @@
       button.addEventListener('click',()=>{
         state.query=''; state.category='all';
         searchInput.value=''; renderResults(); closeSuggestions();
-        if (product.clickable) openDetails(product);
-        else product.card.scrollIntoView({behavior:scrollBehavior(),block:'center'});
+        openDetails(product);
       });
       suggestions.append(button);
     });
@@ -421,12 +439,13 @@
 
   function updateDialog() {
     const product = state.activeProduct;
-    if (!product || !product.clickable) return;
-    dialog.classList.toggle('is-featured', product.category === 'specials');
+    if (!product) return;
     dialogCategory.textContent = categoryName(product.category);
     dialogTitle.textContent = displayName(product);
     dialogDescription.textContent = displayDescription(product);
-    dialogDescription.hidden = !dialogDescription.textContent;
+    dialogDescription.hidden = !dialogDescription.textContent.trim();
+    if (dialogDescription.hidden) dialog.removeAttribute('aria-describedby');
+    else dialog.setAttribute('aria-describedby', dialogDescription.id);
     dialogPriceLabel.textContent = t().price;
     dialogPrice.textContent = readablePrice(product);
     dialogClose.setAttribute('aria-label', t().close);
@@ -441,31 +460,31 @@
       chip.style.setProperty('--chip-index', i);
       dialogIngredientChips.appendChild(chip);
     });
-    dialogVisual.replaceChildren();
-    dialogVisual.classList.toggle('has-photo', Boolean(product.image));
-    dialogVisual.classList.toggle('has-cutout', Boolean(product.image) && product.card.classList.contains('has-cutout'));
-    if (product.image) {
+    const thumbnails = $$(photoSelector, product.card);
+    const photos = thumbnails.map(image => ({
+      src: image.currentSrc || image.getAttribute('src'),
+      alt: image.alt
+    })).filter(photo => photo.src);
+    if (product.category === 'specials' || !photos.length) {
+      if (product.image) photos.splice(0, photos.length, { src: product.image, alt: displayName(product) });
+    }
+    dialogVisual.hidden = photos.length === 0;
+    dialogVisual.classList.toggle('has-photo', photos.length > 0);
+    dialogVisual.classList.toggle('has-cutout', photos.length > 0 && product.card.classList.contains('has-cutout'));
+    dialogVisual.classList.toggle('is-pair', photos.length === 2);
+    dialogVisual.replaceChildren(...photos.map(photo => {
       const img = document.createElement('img');
-      img.src = product.image;
-      img.alt = displayName(product);
+      img.src = photo.src;
+      img.alt = photo.alt;
       img.width = 800;
       img.height = 650;
-      img.loading = 'eager';
-      dialogVisual.append(img);
-    } else {
-      const mark = document.createElement('span');
-      mark.className = 'dialog-placeholder-mark';
-      mark.setAttribute('aria-hidden', 'true');
-      mark.textContent = '✧';
-      const caption = document.createElement('span');
-      caption.className = 'dialog-placeholder-caption';
-      caption.textContent = t().photoPending;
-      dialogVisual.append(mark, caption);
-    }
+      img.decoding = 'async';
+      return img;
+    }));
   }
 
   function openDetails(product) {
-    if (!product?.clickable) return;
+    if (!product) return;
     state.activeProduct = product;
     updateDialog();
     if (!dialog.open) dialog.showModal();
@@ -475,7 +494,7 @@
 
   function closeDetails() {
     if (!dialog.open || dialog.classList.contains('is-closing')) return;
-    if (!dialog.classList.contains('is-featured') || prefersReducedMotion.matches) {
+    if (prefersReducedMotion.matches) {
       dialog.close();
       return;
     }
@@ -519,17 +538,15 @@
     products.forEach(product => {
       const name = displayName(product);
       $('.product-title',product.card).textContent = name;
-      const tap = $('.product-tap',product.card);
-      if (tap && product.clickable) {
-        $('.product-badge',product.card).textContent = product.category === 'specials' ? x.specialBadge : x.plateBadge;
-        const detailsLabel = product.category === 'specials' ? x.specialDetails : x.details;
-        $('.card-more',product.card).firstChild.textContent = detailsLabel + ' ';
-        tap.setAttribute('aria-label',x.view(name));
-        const caption = $('.plate-visual .plate-visual-caption',tap);
-        if (caption) caption.textContent = x.plateCaption;
-      }
-      const image = $('img',product.card);
-      if (image) image.alt = name;
+      product.trigger.setAttribute('aria-label', x.view(name));
+      const badge = $('.product-badge', product.card);
+      if (badge) badge.textContent = product.category === 'specials' ? x.specialBadge : x.plateBadge;
+      const more = $('.card-more', product.card);
+      if (more) more.firstChild.textContent = (product.category === 'specials' ? x.specialDetails : x.details) + ' ';
+      const caption = $('.plate-visual .plate-visual-caption', product.card);
+      if (caption) caption.textContent = x.plateCaption;
+      const image = $('img', product.card);
+      if (image && !image.closest('.photo-visual--pair')) image.alt = name;
       const currency=$('.price small',product.card);
       if(currency) currency.textContent = product.price !== '' ? x.currency : (state.lang==='ar' ? 'اسأل عن السعر' : 'Ask for price');
     });
@@ -623,8 +640,7 @@
   }, {passive: true});
   window.addEventListener('resize',updateSticky,{passive:true});
 
-  // Using real button elements means keyboard Enter/Space and accessibility work naturally.
-  products.forEach(bindCardClick);
+  products.forEach(prepareCard);
   // Fade the text out, swap RTL/LTR at the midpoint, then bring it back in.
   // The original brown/gold hero remains; the decorative coffee was intentionally removed.
   let switchingLanguage = false;
@@ -682,7 +698,7 @@
   syncActiveStickySection();
   const linkedItem = new URLSearchParams(location.search).get('item');
   if (linkedItem) {
-    const matched = products.find(p => p.clickable && (normalize(p.name) === normalize(linkedItem) || normalize(p.en) === normalize(linkedItem)));
+    const matched = products.find(p => normalize(p.name) === normalize(linkedItem) || normalize(p.en) === normalize(linkedItem));
     if (matched) openDetails(matched);
   }
 })();
