@@ -41,8 +41,8 @@ function makeCard(p){
   const cloud = p.imageSource === 'firestore' && p.hasImage;
   const asset = p.imageSource === 'asset' && p.image;
   const supplied = menuPhotos.get(p.id);
-  const photoRow = photoGrids.has(p.category) && Boolean(supplied && (asset || cloud));
-  const menuPhoto = photoRow && asset === supplied.image.split('?')[0] ? supplied : null;
+  const photoRow = photoGrids.has(p.category) && Boolean(asset || cloud);
+  const menuPhoto = photoRow && supplied && asset === supplied.image.split('?')[0] ? supplied : null;
   const cutoutFile = featured && asset && featuredCutouts.has(p.image)
     ? p.image.split('/').pop() : '';
   const detail = featured || photoRow || (p.category === 'mixed-plates' && Boolean(asset || cloud));
@@ -161,6 +161,7 @@ function showCatalog(items){
   const buckets=new Map(categories.map(c=>[c,document.createDocumentFragment()]));
   const photoBuckets=new Map([...photoGrids.keys()].map(c=>[c,document.createDocumentFragment()]));
   const cards=[];
+  const photosWithoutGrid=[];
   catalog.forEach(p=>{
     if(p.imageSource==='firestore' && p.hasImage){
       const v=Number(p.photoVersion||0);
@@ -169,10 +170,13 @@ function showCatalog(items){
     } else {imageVersions.delete(p.id);imageCache.delete(p.id);}
     const card=makeCard(p);
     const bucket=card.hasAttribute('data-menu-photo') ? photoBuckets.get(p.category) : buckets.get(p.category);
-    if(p.category==='specials' && p.id==='specials-533')bucket.prepend(card);
+    if(p.category!=='specials' && !card.hasAttribute('data-menu-photo') && (card.dataset.image || card.dataset.cloudImage)){
+      photosWithoutGrid.push(card);
+    }else if(p.category==='specials' && p.id==='specials-533')bucket.prepend(card);
     else bucket.append(card);
     if(card.dataset.cloudImage)cards.push(card);
   });
+  photosWithoutGrid.forEach(card => buckets.get(card.dataset.category).append(card));
   for(const c of categories){
     const grid=$(`#${c} .products-grid:not(.menu-photo-grid)`);
     if(grid)grid.replaceChildren(buckets.get(c));
